@@ -1,0 +1,2766 @@
+<!DOCTYPE html>
+<html lang="hi" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SheetStore Pro | Zero Monthly Bill E-Commerce Powered by Google Sheet</title>
+  <meta name="description" content="Shopify aur WordPress ka monthly kharcha band karein. Google Sheet se chalne wali 100% free hosting e-commerce website with direct UPI QR & WhatsApp payments." />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Poppins, Outfit, Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Customer Store Auto-Router: When deployed to customer's GitHub Pages, route root to storefront -->
+  <script>
+    (function() {
+      try {
+        const host = window.location.hostname.toLowerCase();
+        const path = window.location.pathname.toLowerCase();
+        const search = window.location.search;
+        const params = new URLSearchParams(search);
+        
+        // If query string explicitly requests landing page, don't redirect
+        if (params.get('landing') === 'true' || params.get('admin') === 'true') return;
+
+        // Check if hosted on customer's GitHub Pages (not localhost and not master account)
+        const isMaster = host === 'localhost' || host === '127.0.0.1' || host === 'yuviteltechnologies-art.github.io';
+        
+        if (!isMaster && host.endsWith('.github.io')) {
+          // Check saved theme or deduce from repository name
+          let chosen = localStorage.getItem('store_active_template') || localStorage.getItem('sheetstore_selected_theme') || '';
+          if (!chosen) {
+            if (path.includes('vastu')) chosen = 'vastu';
+            else if (path.includes('saree')) chosen = 'saree';
+            else if (path.includes('gadget') || path.includes('electronic')) chosen = 'electronics';
+            else if (path.includes('fashion')) chosen = 'fashion';
+            else if (path.includes('grocery')) chosen = 'grocery_food';
+            else if (path.includes('beauty')) chosen = 'beauty_personal_care';
+            else chosen = 'vastu'; // Default flagship
+          }
+
+          if (chosen === 'vastu' || chosen === 'vastu_brahmand') {
+            window.location.replace('vastu-demo.html' + search);
+          } else if (chosen === 'saree' || chosen === 'noolam-saree') {
+            window.location.replace('saree-demo.html' + search);
+          } else {
+            window.location.replace('demo.html?theme=' + encodeURIComponent(chosen));
+          }
+        }
+      } catch(e) {
+        console.warn('Auto router error:', e);
+      }
+    })();
+  </script>
+
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#00040f",
+            secondary: "#00f6ff",
+            dimWhite: "rgba(255, 255, 255, 0.7)",
+            dimBlue: "rgba(9, 151, 124, 0.1)",
+          },
+          fontFamily: {
+            poppins: ["Poppins", "sans-serif"],
+            heading: ["Outfit", "sans-serif"],
+            sans: ["Plus Jakarta Sans", "sans-serif"],
+          },
+        },
+        screens: {
+          xs: "480px",
+          ss: "620px",
+          sm: "768px",
+          md: "1060px",
+          lg: "1200px",
+          xl: "1700px",
+        },
+      },
+    };
+  </script>
+
+  <style>
+    :root {
+      --black-gradient: linear-gradient(144.39deg, #ffffff -278.56%, #6d6d6d -78.47%, #11101d 91.61%);
+      --card-shadow: 0px 20px 100px -10px rgba(66, 71, 91, 0.1);
+    }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #00040f; }
+    ::-webkit-scrollbar-thumb { background: #00f6ff; border-radius: 4px; }
+
+    /* HooBank Signature Cyan Radial Text Gradient */
+    .text-gradient {
+      background: radial-gradient(
+        64.18% 64.18% at 71.16% 35.69%,
+        #def9fa 0.89%,
+        #bef3f5 17.23%,
+        #9dedf0 42.04%,
+        #7de7eb 55.12%,
+        #5ce1e6 71.54%,
+        #33bbcf 100%
+      );
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .bg-blue-gradient {
+      background: linear-gradient(
+        157.81deg,
+        #def9fa -43.27%,
+        #bef3f5 -21.24%,
+        #9dedf0 12.19%,
+        #7de7eb 29.82%,
+        #5ce1e6 51.94%,
+        #33bbcf 90.29%
+      );
+    }
+
+    .bg-black-gradient {
+      background: linear-gradient(144.39deg, #ffffff -278.56%, #6d6d6d -78.47%, #11101d 91.61%);
+    }
+
+    .bg-discount-gradient {
+      background: linear-gradient(125.17deg, #272727 0%, #11101d 100%);
+    }
+
+    .feature-card {
+      transition: all 0.3s ease;
+    }
+    .feature-card:hover {
+      background: var(--black-gradient);
+      box-shadow: 0px 20px 100px -10px rgba(66, 71, 91, 0.25);
+    }
+
+    .feedback-card {
+      background: transparent;
+      transition: all 0.3s ease;
+    }
+    .feedback-card:hover {
+      background: var(--black-gradient);
+    }
+
+    /* HooBank Signature Glow Orbs */
+    .blue__gradient {
+      background: linear-gradient(180deg, rgba(188, 165, 255, 0) 0%, #214d76 100%);
+      filter: blur(120px);
+    }
+
+    .pink__gradient {
+      background: linear-gradient(90deg, #f4c4f3 0%, #fc67fa 100%);
+      filter: blur(180px);
+    }
+
+    .white__gradient {
+      background: rgba(255, 255, 255, 0.6);
+      filter: blur(250px);
+    }
+  </style>
+</head>
+<body class="bg-[#00040f] text-white font-poppins overflow-x-hidden selection:bg-[#00f6ff] selection:text-black">
+
+  <!-- ========================================================
+       1. HOOBANK ULTRA-CLEAN NAVBAR
+       ======================================================== -->
+  <header class="w-full flex py-6 justify-between items-center max-w-7xl mx-auto px-6 sm:px-12 relative z-50">
+    <!-- Brand Logo -->
+    <a href="#" class="flex items-center gap-3 group">
+      <div class="w-10 h-10 rounded-xl bg-blue-gradient flex items-center justify-center text-primary font-black text-xl shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition">
+        <i data-lucide="layers" class="w-5 h-5 text-primary stroke-[2.5]"></i>
+      </div>
+      <div class="flex flex-col">
+        <span class="font-poppins font-black text-xl tracking-tight text-white flex items-center gap-1">
+          SheetStore<span class="text-gradient">Pro</span>
+        </span>
+        <span class="text-[9px] uppercase tracking-wider text-cyan-400 font-semibold flex items-center gap-1">
+          <span>Digital Products &amp; E-Commerce</span>
+        </span>
+      </div>
+    </a>
+
+    <!-- Desktop Navigation Links -->
+    <nav class="hidden md:flex items-center gap-8 text-sm text-dimWhite font-medium">
+      <a href="#features" class="hover:text-secondary transition">Features</a>
+      <a href="#how-it-works" class="hover:text-secondary transition">How It Works</a>
+      <a href="#demos" onclick="openDemoSelectorModal(); return false;" class="text-secondary font-bold hover:text-white transition flex items-center gap-1">
+        <span>Live Demos</span>
+        <span class="text-[9px] px-1.5 py-0.2 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-mono">2</span>
+      </a>
+      <a href="#pricing" class="hover:text-secondary transition">Pricing</a>
+      <a href="#faq" class="hover:text-secondary transition">FAQs</a>
+    </nav>
+
+    <!-- Nav Right Utility Buttons -->
+    <div class="flex items-center gap-3">
+      <!-- Live Demo Modal Button -->
+      <button onclick="openDemoSelectorModal()" 
+              class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyan-400 text-xs text-white font-medium transition shadow-md">
+        <i data-lucide="eye" class="w-3.5 h-3.5 text-cyan-400"></i>
+        <span>Explore Demos</span>
+      </button>
+
+      <!-- Auth Dashboard Link -->
+      <a href="dashboard.html" id="navAuthBtn" 
+         class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-gradient text-primary font-bold text-xs hover:opacity-90 transition shadow-lg shadow-cyan-500/20 active:scale-95">
+        <i data-lucide="zap" class="w-3.5 h-3.5 stroke-[2.5]"></i>
+        <span id="navAuthText">Launch Store</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ========================================================
+       2. HERO SECTION: DIGITAL PRODUCTS & E-COMMERCE ECOSYSTEM
+       ======================================================== -->
+  <section id="home" class="flex md:flex-row flex-col py-6 sm:py-12 max-w-7xl mx-auto px-6 sm:px-12 relative overflow-hidden">
+    
+    <!-- Left Hero Content Column -->
+    <div class="flex-1 flex flex-col justify-center xl:px-0 relative z-10">
+      
+      <!-- Tech Badge Capsule -->
+      <div class="inline-flex items-center py-1.5 px-4 bg-discount-gradient rounded-[10px] mb-4 w-fit border border-slate-800 shadow-md">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-2.5"></span>
+        <p class="text-xs sm:text-sm text-dimWhite font-poppins">
+          <span class="text-white font-bold">Digital Products &amp; E-Commerce</span> • <span class="text-secondary font-bold">100% Free Lifetime System</span>
+        </p>
+      </div>
+
+      <!-- Main Headline with Circular "Get Started" Button -->
+      <div class="flex flex-row justify-between items-center w-full">
+        <h1 class="flex-1 font-poppins font-bold ss:text-[54px] text-[36px] text-white ss:leading-[70px] leading-[46px]">
+          Digital Products Bechein, <br class="sm:block hidden"/>
+          <span class="text-gradient">Zero Monthly Hosting Bill</span>
+        </h1>
+        
+        <!-- Circular HooBank Style "Get Started" Button (Desktop) -->
+        <div class="ss:flex hidden md:mr-4 mr-0">
+          <a href="#pricing" class="w-[130px] h-[130px] rounded-full bg-blue-gradient p-[2px] cursor-pointer flex items-center justify-center transition hover:scale-105 active:scale-95 shadow-xl shadow-cyan-500/25 group">
+            <div class="flex flex-col items-center justify-center bg-primary w-full h-full rounded-full group-hover:bg-[#020d1c] transition">
+              <div class="flex items-center gap-1">
+                <span class="text-gradient font-poppins font-bold text-sm">Apna</span>
+                <img src="assets/images/hoobank/arrow-up.svg" alt="Arrow" class="w-4 h-4 object-contain group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition" />
+              </div>
+              <span class="text-gradient font-poppins font-bold text-sm">Store Banayein</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <h1 class="font-poppins font-bold ss:text-[42px] text-[28px] text-slate-300 ss:leading-[56px] leading-[38px] w-full mt-1">
+        Google Sheet + GitHub + Free APK Ke Sath.
+      </h1>
+
+      <!-- Subheadline -->
+      <p class="font-poppins font-normal text-dimWhite text-sm sm:text-base max-w-[520px] mt-6 leading-relaxed">
+        Shopify aur WordPress ka ₹2,500/month kharcha band karein. Frontend <b>GitHub Pages</b> par free, backend <b>Google Sheet</b> par free, aur mobile se store chalane ke liye <b>Free Android APK</b>! E-books, Software, Courses, Presets ya Physical products bechein direct UPI payment (0% commission) par.
+      </p>
+
+      <!-- Mobile CTA Buttons -->
+      <div class="flex flex-wrap items-center gap-3 mt-8">
+        <a href="#pricing" 
+           class="px-7 py-3.5 rounded-xl bg-blue-gradient text-primary font-poppins font-bold text-sm shadow-xl shadow-cyan-500/20 hover:opacity-95 transition active:scale-95 flex items-center gap-2">
+          <i data-lucide="zap" class="w-4 h-4 stroke-[2.5]"></i>
+          <span>Store Shuru Karein (₹499)</span>
+        </a>
+        <button onclick="openDemoSelectorModal()" 
+                class="px-6 py-3.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyan-400 text-white font-poppins font-medium text-sm transition shadow-lg flex items-center gap-2 group">
+          <i data-lucide="eye" class="w-4 h-4 text-cyan-400 group-hover:scale-110 transition"></i>
+          <span>Live Demos (2 Stores)</span>
+        </button>
+      </div>
+
+      <!-- Quick Tech Badges Row -->
+      <div class="flex flex-wrap items-center gap-2.5 mt-8 pt-6 border-t border-slate-800/80 text-xs">
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-800 text-slate-300">
+          <svg class="w-4 h-4 fill-white shrink-0" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          <span class="font-medium">GitHub <b class="text-cyan-400">Frontend</b></span>
+        </div>
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-800 text-slate-300">
+          <svg class="w-4 h-4 shrink-0" viewBox="0 0 48 48"><path fill="#0F9D58" d="M37,45H11c-2.2,0-4-1.8-4-4V7c0-2.2,1.8-4,4-4h18l12,12v26C41,43.2,39.2,45,37,45z"/><path fill="#87CEAC" d="M29,3v12h12L29,3z"/><path fill="#ffffff" d="M14,21h20v18H14V21z"/><path fill="#0F9D58" d="M16,23h6v4h-6V23z M24,23h8v4h-8V23z M16,29h6v4h-6V29z M24,29h8v4h-8V29z M16,35h6v4h-6V35z M24,35h8v4h-8V35z"/></svg>
+          <span class="font-medium">Google Sheet <b class="text-emerald-400">Backend</b></span>
+        </div>
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-slate-800 text-slate-300">
+          <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="#3DDC84"><path d="M17.523 15.34c-.436 0-.79-.354-.79-.79 0-.437.354-.79.79-.79.436 0 .79.353.79.79 0 .436-.354.79-.79.79m-11.046 0c-.437 0-.79-.354-.79-.79 0-.437.353-.79.79-.79.436 0 .79.353.79.79 0 .436-.354.79-.79.79m11.405-6.02l1.997-3.46a.416.416 0 00-.152-.567.416.416 0 00-.568.152l-2.023 3.504A12.78 12.78 0 0012 7.915c-1.82 0-3.518.384-5.136 1.054L4.84 5.465a.416.416 0 00-.568-.152.416.416 0 00-.152.567l1.997 3.46C2.688 11.286 0 15.34 0 20.08h24c0-4.74-2.688-8.794-6.118-10.76"/></svg>
+          <span class="font-medium">Free Android <b class="text-emerald-400">APK</b></span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Column: Interactive Digital Store & 3-Pillar Ecosystem Visual -->
+    <div class="flex-1 flex items-center justify-center md:my-0 my-10 relative">
+      
+      <!-- Glowing Radiant Gradient Blurs -->
+      <div class="absolute z-[0] w-[60%] h-[50%] top-0 pink__gradient opacity-50 pointer-events-none"></div>
+      <div class="absolute z-[1] w-[80%] h-[80%] rounded-full white__gradient bottom-10 opacity-30 pointer-events-none"></div>
+      <div class="absolute z-[0] w-[60%] h-[60%] right-10 bottom-0 blue__gradient opacity-50 pointer-events-none"></div>
+
+      <!-- Main Interactive Ecosystem Container -->
+      <div class="w-full max-w-[520px] relative z-10">
+
+        <!-- Browser / Storefront Mockup Frame -->
+        <div class="rounded-3xl bg-slate-900/85 border-2 border-cyan-500/40 backdrop-blur-xl shadow-2xl p-4 sm:p-6 relative overflow-hidden group hover:border-cyan-400 transition-all duration-500">
+          
+          <div class="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+          <!-- Browser Chrome Header Bar -->
+          <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+            </div>
+            <div class="flex items-center gap-1.5 bg-slate-950/90 px-3 py-1 rounded-full border border-slate-800 text-[11px] text-cyan-300 font-mono">
+              <i data-lucide="lock" class="w-3 h-3 text-emerald-400"></i>
+              <span>mystore.github.io</span>
+              <span class="text-[9px] px-1 rounded bg-emerald-500/20 text-emerald-300 font-bold">SSL FREE</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-[10px] text-emerald-400 font-mono font-bold">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span>100% ONLINE</span>
+            </div>
+          </div>
+
+          <!-- Live Digital Product Showcase Card -->
+          <div class="p-4 rounded-2xl bg-slate-950/80 border border-slate-800/90 flex flex-col sm:flex-row gap-4 items-center relative overflow-hidden">
+            <div class="w-full sm:w-32 h-28 rounded-xl bg-gradient-to-br from-cyan-500/20 via-blue-600/20 to-purple-600/30 border border-cyan-500/30 flex flex-col items-center justify-center p-3 text-center shrink-0 relative overflow-hidden">
+              <div class="w-10 h-10 rounded-lg bg-blue-gradient flex items-center justify-center text-primary mb-1 shadow-md">
+                <i data-lucide="package" class="w-5 h-5 stroke-[2.5]"></i>
+              </div>
+              <span class="text-[10px] font-bold text-white uppercase tracking-tight">Full Stack Pack</span>
+              <span class="text-[8px] text-cyan-300 font-mono">ZIP + Videos + Drive</span>
+              <span class="absolute top-1 right-1 text-[8px] bg-rose-500 text-white px-1.5 py-0.2 rounded font-bold">HOT</span>
+            </div>
+
+            <!-- Product Details -->
+            <div class="flex-1 w-full text-left">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 text-[10px] font-bold border border-cyan-500/30">
+                  ⚡ Digital Product
+                </span>
+                <span class="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-bold">
+                  Auto Drive Link
+                </span>
+              </div>
+              <h4 class="text-sm font-bold text-white mt-1 font-poppins">
+                AI &amp; Web Store Master Bundle
+              </h4>
+              <p class="text-[11px] text-dimWhite line-clamp-2 mt-0.5">
+                Google Sheet backend se live price sync aur direct UPI payment se instant link delivery.
+              </p>
+              
+              <div class="flex items-center justify-between mt-3 pt-2 border-t border-slate-800/80">
+                <div class="flex items-baseline gap-1.5">
+                  <span class="text-base font-black text-white font-poppins">₹499</span>
+                  <span class="text-[11px] text-dimWhite line-through">₹2,499</span>
+                  <span class="text-[9px] text-emerald-400 font-bold">80% OFF</span>
+                </div>
+                <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-gradient text-primary text-xs font-black shadow-md shadow-cyan-500/20">
+                  <i data-lucide="zap" class="w-3.5 h-3.5 fill-current"></i>
+                  <span>Buy with UPI</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- The 3 Pillars Architecture (GitHub + Google Sheet + Android APK) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mt-4">
+            
+            <!-- Pillar 1: GitHub Frontend -->
+            <div class="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-cyan-400/50 transition flex items-center gap-2">
+              <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+              </div>
+              <div class="min-w-0">
+                <span class="text-[9px] text-cyan-400 font-bold uppercase block tracking-wider">Frontend</span>
+                <p class="text-xs font-bold text-white truncate">GitHub Pages</p>
+                <span class="text-[9px] text-emerald-400 font-mono">₹0 Forever</span>
+              </div>
+            </div>
+
+            <!-- Pillar 2: Google Sheet Backend -->
+            <div class="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-emerald-400/50 transition flex items-center gap-2">
+              <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" viewBox="0 0 48 48"><path fill="#0F9D58" d="M37,45H11c-2.2,0-4-1.8-4-4V7c0-2.2,1.8-4,4-4h18l12,12v26C41,43.2,39.2,45,37,45z"/><path fill="#87CEAC" d="M29,3v12h12L29,3z"/><path fill="#ffffff" d="M14,21h20v18H14V21z"/><path fill="#0F9D58" d="M16,23h6v4h-6V23z M24,23h8v4h-8V23z M16,29h6v4h-6V29z M24,29h8v4h-8V29z M16,35h6v4h-6V35z M24,35h8v4h-8V35z"/></svg>
+              </div>
+              <div class="min-w-0">
+                <span class="text-[9px] text-emerald-400 font-bold uppercase block tracking-wider">Backend</span>
+                <p class="text-xs font-bold text-white truncate">Google Sheet</p>
+                <span class="text-[9px] text-emerald-400 font-mono">Live Database</span>
+              </div>
+            </div>
+
+            <!-- Pillar 3: Android APK -->
+            <div class="p-2.5 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-emerald-400/50 transition flex items-center gap-2">
+              <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="#3DDC84"><path d="M17.523 15.34c-.436 0-.79-.354-.79-.79 0-.437.354-.79.79-.79.436 0 .79.353.79.79 0 .436-.354.79-.79.79m-11.046 0c-.437 0-.79-.354-.79-.79 0-.437.353-.79.79-.79.436 0 .79.353.79.79 0 .436-.354.79-.79.79m11.405-6.02l1.997-3.46a.416.416 0 00-.152-.567.416.416 0 00-.568.152l-2.023 3.504A12.78 12.78 0 0012 7.915c-1.82 0-3.518.384-5.136 1.054L4.84 5.465a.416.416 0 00-.568-.152.416.416 0 00-.152.567l1.997 3.46C2.688 11.286 0 15.34 0 20.08h24c0-4.74-2.688-8.794-6.118-10.76"/></svg>
+              </div>
+              <div class="min-w-0">
+                <span class="text-[9px] text-emerald-400 font-bold uppercase block tracking-wider">Control</span>
+                <p class="text-xs font-bold text-white truncate">Android APK</p>
+                <span class="text-[9px] text-cyan-400 font-mono">Push Alerts</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom Live Status Bar: Direct UPI & Push Notification Pulse -->
+          <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span class="text-white font-medium">Direct UPI QR:</span>
+              <span class="text-emerald-400 font-bold">0% Gateway Fee</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-cyan-300 font-mono text-[10px] bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800">
+              <i data-lucide="bell-ring" class="w-3 h-3 text-cyan-400"></i>
+              <span>Push Notification v1.0.2 Active</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Floating Notification Card (Bottom Floating Pill) -->
+        <div class="absolute -bottom-6 -left-3 sm:left-4 z-20 bg-slate-900/95 backdrop-blur-md border border-cyan-500/40 p-3 rounded-2xl shadow-2xl flex items-center gap-3 max-w-[320px] hover:scale-105 transition">
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold shrink-0">
+            <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+          </div>
+          <div class="text-left">
+            <p class="text-[11px] font-bold text-white font-poppins">🎉 Naya Order Aaya! #ORD-417899</p>
+            <p class="text-[10px] text-dimWhite">₹499 Direct Bank • Sheet &amp; APK Synced</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ========================================================
+       3. ECOSYSTEM STATS ROW
+       ======================================================== -->
+  <section class="max-w-7xl mx-auto px-6 sm:px-12 py-10 relative z-10">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 bg-slate-950/60 p-6 rounded-2xl border border-slate-800">
+      
+      <div class="flex flex-col items-center sm:items-start border-r border-slate-800/80 pr-4">
+        <h4 class="font-poppins font-bold text-2xl sm:text-3xl text-white">₹0 / Mo.</h4>
+        <p class="font-poppins font-normal text-xs sm:text-sm text-gradient uppercase tracking-wider mt-1">GitHub Free Hosting</p>
+      </div>
+
+      <div class="flex flex-col items-center sm:items-start border-r border-slate-800/80 pr-4">
+        <h4 class="font-poppins font-bold text-2xl sm:text-3xl text-white">100% Free</h4>
+        <p class="font-poppins font-normal text-xs sm:text-sm text-gradient uppercase tracking-wider mt-1">Google Sheet Backend</p>
+      </div>
+
+      <div class="flex flex-col items-center sm:items-start border-r border-slate-800/80 pr-4">
+        <h4 class="font-poppins font-bold text-2xl sm:text-3xl text-white">Free APK</h4>
+        <p class="font-poppins font-normal text-xs sm:text-sm text-gradient uppercase tracking-wider mt-1">Mobile Admin App</p>
+      </div>
+
+      <div class="flex flex-col items-center sm:items-start">
+        <h4 class="font-poppins font-bold text-2xl sm:text-3xl text-white">0% Fee</h4>
+        <p class="font-poppins font-normal text-xs sm:text-sm text-gradient uppercase tracking-wider mt-1">Direct Bank UPI</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================
+       4. ECOSYSTEM PILLARS: GITHUB + GOOGLE SHEET + ANDROID APK
+       ======================================================== -->
+  <section id="features" class="py-16 sm:py-24 max-w-7xl mx-auto px-6 sm:px-12 flex md:flex-row flex-col items-center gap-12 relative">
+    
+    <!-- Left Column: Title & Intro -->
+    <div class="flex-1 flex flex-col justify-center">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold mb-4 w-fit">
+        <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+        <span>100% Zero-Investment Stack</span>
+      </div>
+      <h2 class="font-poppins font-bold text-3xl sm:text-5xl text-white leading-tight">
+        Aap business sambhaliye, <br class="sm:block hidden" />
+        <span class="text-gradient">Technology humne free kardi.</span>
+      </h2>
+      <p class="font-poppins font-normal text-dimWhite text-sm sm:text-base max-w-[470px] mt-6 leading-relaxed">
+        Bina kisi recurring subscription ke apni digital ya physical dukaan chalaayein. Google Sheet se price badaliye, customer se direct PhonePe/GPay par payment lijiye, aur orders free mobile app par paayein.
+      </p>
+      <div class="mt-8">
+        <a href="#pricing" class="inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-blue-gradient text-primary font-poppins font-bold text-sm transition active:scale-95 shadow-xl shadow-cyan-500/20">
+          <span>Get Started Now</span>
+          <i data-lucide="arrow-right" class="w-4 h-4 stroke-[2.5]"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Right Column: 3 Interactive Feature Cards -->
+    <div class="flex-1 flex flex-col gap-4 w-full">
+      
+      <!-- Feature Card 1: Google Sheet Backend -->
+      <div class="flex flex-row p-5 sm:p-6 rounded-[20px] feature-card border border-slate-800 cursor-pointer">
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-emerald-500/10 border border-emerald-500/30 shrink-0 mr-4">
+          <svg class="w-7 h-7" viewBox="0 0 48 48">
+            <path fill="#0F9D58" d="M37,45H11c-2.2,0-4-1.8-4-4V7c0-2.2,1.8-4,4-4h18l12,12v26C41,43.2,39.2,45,37,45z"/>
+            <path fill="#87CEAC" d="M29,3v12h12L29,3z"/>
+            <path fill="#ffffff" d="M14,21h20v18H14V21z"/>
+            <path fill="#0F9D58" d="M16,23h6v4h-6V23z M24,23h8v4h-8V23z M16,29h6v4h-6V29z M24,29h8v4h-8V29z M16,35h6v4h-6V35z M24,35h8v4h-8V35z"/>
+          </svg>
+        </div>
+        <div class="flex-1 flex flex-col">
+          <div class="flex items-center gap-2">
+            <h4 class="font-poppins font-semibold text-white text-base sm:text-lg">
+              100% Free Google Sheet Backend
+            </h4>
+            <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono font-bold">DATABASE</span>
+          </div>
+          <p class="font-poppins font-normal text-dimWhite text-xs sm:text-sm leading-relaxed mt-1">
+            Mobile se Google Sheet me price, product photo, digital download link aur inventory update karein — bina kisi server ke instant website par live sync.
+          </p>
+        </div>
+      </div>
+
+      <!-- Feature Card 2: GitHub Free Frontend -->
+      <div class="flex flex-row p-5 sm:p-6 rounded-[20px] feature-card border border-slate-800 cursor-pointer">
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-white/10 border border-white/20 shrink-0 mr-4">
+          <svg class="w-7 h-7 fill-white" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+        </div>
+        <div class="flex-1 flex flex-col">
+          <div class="flex items-center gap-2">
+            <h4 class="font-poppins font-semibold text-white text-base sm:text-lg">
+              GitHub Pages: Free Frontend Hosting
+            </h4>
+            <span class="text-[9px] px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 font-mono font-bold">FRONTEND</span>
+          </div>
+          <p class="font-poppins font-normal text-dimWhite text-xs sm:text-sm leading-relaxed mt-1">
+            Shopify ka ₹2,500/month bill hamesha ke liye band. GitHub ke global CDN aur free SSL HTTPS encryption par aapki store website lifetime free live rahegi.
+          </p>
+        </div>
+      </div>
+
+      <!-- Feature Card 3: Free Android APK & Direct UPI -->
+      <div class="flex flex-row p-5 sm:p-6 rounded-[20px] feature-card border border-slate-800 cursor-pointer">
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-emerald-500/10 border border-emerald-500/30 shrink-0 mr-4">
+          <svg class="w-7 h-7" viewBox="0 0 24 24" fill="#3DDC84">
+            <path d="M17.523 15.34c-.436 0-.79-.354-.79-.79 0-.437.354-.79.79-.79.436 0 .79.353.79.79 0 .436-.354.79-.79.79m-11.046 0c-.437 0-.79-.354-.79-.79 0-.437.353-.79.79-.79.436 0 .79.353.79.79 0 .436-.354.79-.79.79m11.405-6.02l1.997-3.46a.416.416 0 00-.152-.567.416.416 0 00-.568.152l-2.023 3.504A12.78 12.78 0 0012 7.915c-1.82 0-3.518.384-5.136 1.054L4.84 5.465a.416.416 0 00-.568-.152.416.416 0 00-.152.567l1.997 3.46C2.688 11.286 0 15.34 0 20.08h24c0-4.74-2.688-8.794-6.118-10.76"/>
+          </svg>
+        </div>
+        <div class="flex-1 flex flex-col">
+          <div class="flex items-center gap-2">
+            <h4 class="font-poppins font-semibold text-white text-base sm:text-lg">
+              Free Android APK &bull; Direct UPI (0% Fee)
+            </h4>
+            <span class="text-[9px] px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 font-mono font-bold">CONTROL</span>
+          </div>
+          <p class="font-poppins font-normal text-dimWhite text-xs sm:text-sm leading-relaxed mt-1">
+            Naye customer order ka sound &amp; vibration alert mobile me paayein. Paisa direct PhonePe, Google Pay ya Bank account me (0% gateway commission).
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ========================================================
+       4B. HOW IT WORKS: 3-STEP 100% FREE ARCHITECTURE
+       ======================================================== -->
+  <section id="how-it-works" class="py-16 sm:py-24 max-w-7xl mx-auto px-6 sm:px-12 relative overflow-hidden">
+    
+    <!-- Background Glow Orbs -->
+    <div class="absolute z-[0] w-[40%] h-[40%] -left-[10%] top-[20%] rounded-full blue__gradient opacity-40 pointer-events-none"></div>
+    <div class="absolute z-[0] w-[35%] h-[35%] -right-[5%] bottom-[10%] rounded-full pink__gradient opacity-30 pointer-events-none"></div>
+
+    <!-- Section Header -->
+    <div class="text-center max-w-3xl mx-auto mb-16 relative z-10">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900 border border-cyan-500/30 text-cyan-400 text-xs font-semibold mb-4 shadow-sm">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+        <span>100% Free Lifetime Architecture</span>
+      </div>
+      <h2 class="font-poppins font-bold text-3xl sm:text-5xl text-white leading-tight">
+        How It Works — <br class="hidden sm:block" />
+        <span class="text-gradient">3 Simple Steps Me Poora System Free</span>
+      </h2>
+      <p class="font-poppins font-normal text-dimWhite text-sm sm:text-base mt-4 max-w-2xl mx-auto leading-relaxed">
+        Koi expensive Shopify subscription nahi, koi monthly web hosting kharcha nahi. Frontend GitHub par, backend Google Sheet par, aur updation ke liye free Android APK!
+      </p>
+    </div>
+
+    <!-- 3 Big Steps Cards Grid -->
+    <div class="space-y-12 relative z-10">
+
+      <!-- STEP 1: FRONTEND WITH GITHUB -->
+      <div class="p-6 sm:p-10 rounded-[24px] bg-slate-900/60 border border-slate-800 hover:border-cyan-500/40 backdrop-blur-xl transition duration-300">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8 border-b border-slate-800 pb-6">
+          <div class="flex items-start sm:items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0 font-black text-2xl font-mono shadow-lg shadow-cyan-500/10">
+              01
+            </div>
+            <div>
+              <div class="flex items-center gap-3 flex-wrap">
+                <span class="px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 text-[11px] font-bold uppercase tracking-wider border border-cyan-500/20">
+                  Step 1 &bull; Frontend
+                </span>
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[11px] font-bold border border-emerald-500/20">
+                  100% Free Lifetime Hosting
+                </span>
+              </div>
+              <h3 class="font-poppins font-bold text-xl sm:text-2xl text-white mt-1">
+                Connect with GitHub Pages (Zero Hosting &amp; Server Cost)
+              </h3>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xs text-dimWhite font-mono bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
+              ₹0/Month Forever
+            </span>
+          </div>
+        </div>
+
+        <p class="font-poppins font-normal text-dimWhite text-sm leading-relaxed mb-4">
+          Aapka storefront 24/7 bina kisi hosting down-time ke GitHub ke ultra-fast global CDN par run hota hai. Free SSL HTTPS encryption padlock, automatic cache invalidation aur custom domain (.com, .in) support included hai.
+        </p>
+
+        <!-- 1-Click Popup Copy Bar -->
+        <div class="mb-6 p-4 rounded-2xl bg-slate-950/90 border border-cyan-500/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0 shadow">
+              <i data-lucide="git-fork" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h4 class="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
+                <span>Frontend Repository 1-Click Me Copy Karein</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">Popup Ready</span>
+              </h4>
+              <p class="text-[11px] text-dimWhite mt-0.5">Popup window me kholein aur 404 error se bachne ke aasan steps follow karein.</p>
+            </div>
+          </div>
+          <button type="button" onclick="openGitHubRepoPopup()" class="w-full sm:w-auto px-5 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-black font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 transition active:scale-95 shrink-0">
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            <span>Popup Me Repo Copy Karein ➔</span>
+          </button>
+        </div>
+
+        <!-- 3 Interactive Screenshots Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <!-- Screenshot 1 -->
+          <div class="group relative rounded-2xl bg-slate-950 border border-slate-800 hover:border-cyan-400/60 overflow-hidden cursor-pointer transition shadow-lg"
+               onclick="openImageModal('assets/images/github-step1-google-signin.png', 'Step 1.1: GitHub Account Setup — Free Google Sign-In')">
+            <div class="aspect-[16/10] overflow-hidden bg-slate-900 relative">
+              <img src="assets/images/github-step1-google-signin.png" alt="GitHub Account Sign-In" 
+                   class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                <span class="px-3 py-1 rounded-full bg-cyan-500 text-black text-xs font-bold flex items-center gap-1 shadow-lg">
+                  <i data-lucide="zoom-in" class="w-3.5 h-3.5"></i> Click to Zoom
+                </span>
+              </div>
+            </div>
+            <div class="p-3.5">
+              <span class="text-[10px] text-cyan-400 font-bold uppercase tracking-wider block">Part 1</span>
+              <p class="text-xs font-semibold text-white mt-0.5 line-clamp-1">GitHub Google Sign-In &amp; Free Account</p>
+              <p class="text-[11px] text-dimWhite mt-1">10 second me GitHub account create karein bina credit card ke.</p>
+            </div>
+          </div>
+
+          <!-- Screenshot 2 -->
+          <div class="group relative rounded-2xl bg-slate-950 border border-slate-800 hover:border-cyan-400/60 overflow-hidden cursor-pointer transition shadow-lg"
+               onclick="openImageModal('assets/images/github-step3-create-repo.png', 'Step 1.2: Create Repository — Upload Free Store Code')">
+            <div class="aspect-[16/10] overflow-hidden bg-slate-900 relative">
+              <img src="assets/images/github-step3-create-repo.png" alt="Create New GitHub Repository" 
+                   class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                <span class="px-3 py-1 rounded-full bg-cyan-500 text-black text-xs font-bold flex items-center gap-1 shadow-lg">
+                  <i data-lucide="zoom-in" class="w-3.5 h-3.5"></i> Click to Zoom
+                </span>
+              </div>
+            </div>
+            <div class="p-3.5">
+              <span class="text-[10px] text-cyan-400 font-bold uppercase tracking-wider block">Part 2</span>
+              <p class="text-xs font-semibold text-white mt-0.5 line-clamp-1">Create Repository &amp; Push Files</p>
+              <p class="text-[11px] text-dimWhite mt-1">Apna repository banayein aur storefront files upload karein.</p>
+            </div>
+          </div>
+
+          <!-- Screenshot 3 -->
+          <div class="group relative rounded-2xl bg-slate-950 border border-slate-800 hover:border-cyan-400/60 overflow-hidden cursor-pointer transition shadow-lg"
+               onclick="openImageModal('assets/images/github-pages-step2-main-save.jpg', 'Step 1.3: GitHub Pages Activation — Live Storefront URL')">
+            <div class="aspect-[16/10] overflow-hidden bg-slate-900 relative">
+              <img src="assets/images/github-pages-step2-main-save.jpg" alt="Enable GitHub Pages Branch" 
+                   class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                <span class="px-3 py-1 rounded-full bg-cyan-500 text-black text-xs font-bold flex items-center gap-1 shadow-lg">
+                  <i data-lucide="zoom-in" class="w-3.5 h-3.5"></i> Click to Zoom
+                </span>
+              </div>
+            </div>
+            <div class="p-3.5">
+              <span class="text-[10px] text-cyan-400 font-bold uppercase tracking-wider block">Part 3</span>
+              <p class="text-xs font-semibold text-white mt-0.5 line-clamp-1">Turn ON GitHub Pages</p>
+              <p class="text-[11px] text-dimWhite mt-1">Branch select karke Save karein aur live public URL generate karein.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: BACKEND WITH GOOGLE SHEET -->
+      <div class="p-6 sm:p-10 rounded-[24px] bg-slate-900/60 border border-slate-800 hover:border-emerald-500/40 backdrop-blur-xl transition duration-300">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8 border-b border-slate-800 pb-6">
+          <div class="flex items-start sm:items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 font-black text-2xl font-mono shadow-lg shadow-emerald-500/10">
+              02
+            </div>
+            <div>
+              <div class="flex items-center gap-3 flex-wrap">
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[11px] font-bold uppercase tracking-wider border border-emerald-500/20">
+                  Step 2 &bull; Backend
+                </span>
+                <span class="px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 text-[11px] font-bold border border-cyan-500/20">
+                  100% Free Database &amp; API
+                </span>
+              </div>
+              <h3 class="font-poppins font-bold text-xl sm:text-2xl text-white mt-1">
+                Connect with Google Sheet (Zero SQL &amp; Server Fees)
+              </h3>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xs text-dimWhite font-mono bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
+              Unlimited Rows &bull; ₹0/Mo
+            </span>
+          </div>
+        </div>
+
+        <p class="font-poppins font-normal text-dimWhite text-sm leading-relaxed mb-6">
+          Aapki standard Google Sheet hi aapke e-commerce store ka real-time database ban jati hai. Products, prices, stock, discounts aur customer orders sab Google Apps Script Web App ke through automatic sync hote hain.
+        </p>
+
+        <!-- 3 Interactive Screenshots Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <!-- Screenshot 1 -->
+          <div class="group relative rounded-2xl bg-slate-950 border border-slate-800 hover:border-emerald-400/60 overflow-hidden cursor-pointer transition shadow-lg"
+               onclick="openImageModal('assets/images/appscript-step2-click-apps-script.jpg', 'Step 2.1: Open Apps Script from Google Sheet Extensions')">
+            <div class="aspect-[16/10] overflow-hidden bg-slate-900 relative">
+              <img src="assets/images/appscript-step2-click-apps-script.jpg" alt="Google Sheet Extensions Apps Script" 
+                   class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                <span class="px-3 py-1 rounded-full bg-emerald-500 text-black text-xs font-bold flex items-center gap-1 shadow-lg">
+                  <i data-lucide="zoom-in" class="w-3.5 h-3.5"></i> Click to Zoom
+                </span>
+              </div>
+            </div>
+            <div class="p-3.5">
+              <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block">Part 1</span>
+              <p class="text-xs font-semibold text-white mt-0.5 line-clamp-1">Extensions &gt; Apps Script</p>
+              <p class="text-[11px] text-dimWhite mt-1">Google Sheet ke Extensions menu se 1-click me Apps Script kholein.</p>
+            </div>
+          </div>
+
+          <!-- Screenshot 2 -->
+          <div class="group relative rounded-2xl bg-slate-950 border border-slate-800 hover:border-emerald-400/60 overflow-hidden cursor-pointer transition shadow-lg"
+               onclick="openImageModal('assets/images/appscript-step5-configure-anyone.jpg', 'Step 2.2: Configure Web App Deployment (Who has access: Anyone)')">
+            <div class="aspect-[16/10] overflow-hidden bg-slate-900 relative">
+              <img src="assets/images/appscript-step5-configure-anyone.jpg" alt="Deploy Web App Configuration" 
+                   class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                <span class="px-3 py-1 rounded-full bg-emerald-500 text-black text-xs font-bold flex items-center gap-1 shadow-lg">
+                  <i data-lucide="zoom-in" class="w-3.5 h-3.5"></i> Click to Zoom
+                </span>
+              </div>
+            </div>
+            <div class="p-3.5">
+              <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block">Part 2</span>
+              <p class="text-xs font-semibold text-white mt-0.5 line-clamp-1">Deploy as Web App (Access: Anyone)</p>
+              <p class="text-[11px] text-dimWhite mt-1">Web App deploy karein taaki aapki website sheet se direct baat kare.</p>
+            </div>
+          </div>
+
+          <!-- Screenshot 3 -->
+          <div class="group relative rounded-2xl bg-slate-950 border border-slate-800 hover:border-emerald-400/60 overflow-hidden cursor-pointer transition shadow-lg"
+               onclick="openImageModal('assets/images/appscript-step10-copy-webapp-url.jpg', 'Step 2.3: Copy Web App URL & Connect in Dashboard')">
+            <div class="aspect-[16/10] overflow-hidden bg-slate-900 relative">
+              <img src="assets/images/appscript-step10-copy-webapp-url.jpg" alt="Copy Web App URL" 
+                   class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                <span class="px-3 py-1 rounded-full bg-emerald-500 text-black text-xs font-bold flex items-center gap-1 shadow-lg">
+                  <i data-lucide="zoom-in" class="w-3.5 h-3.5"></i> Click to Zoom
+                </span>
+              </div>
+            </div>
+            <div class="p-3.5">
+              <span class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider block">Part 3</span>
+              <p class="text-xs font-semibold text-white mt-0.5 line-clamp-1">Copy Web App URL &amp; Link Store</p>
+              <p class="text-[11px] text-dimWhite mt-1">Generated Web App URL copy karke dashboard me paste kar dein.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3: UPDATATION WITH FREE ANDROID APK -->
+      <div class="p-6 sm:p-10 rounded-[24px] bg-slate-900/60 border border-slate-800 hover:border-blue-500/40 backdrop-blur-xl transition duration-300">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8 border-b border-slate-800 pb-6">
+          <div class="flex items-start sm:items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0 font-black text-2xl font-mono shadow-lg shadow-blue-500/10">
+              03
+            </div>
+            <div>
+              <div class="flex items-center gap-3 flex-wrap">
+                <span class="px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 text-[11px] font-bold uppercase tracking-wider border border-blue-500/20">
+                  Step 3 &bull; Updation &amp; Management
+                </span>
+                <span class="px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 text-[11px] font-bold border border-cyan-500/20">
+                  Free Android Admin APK
+                </span>
+              </div>
+              <h3 class="font-poppins font-bold text-xl sm:text-2xl text-white mt-1">
+                Store Updation Ke Liye Free Android APK (Manage Everything from Phone)
+              </h3>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <a href="downloads/SheetStore-Admin.apk" download 
+               class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-gradient text-primary font-bold text-xs hover:opacity-90 transition shadow-lg shadow-cyan-500/20 active:scale-95">
+              <i data-lucide="download" class="w-4 h-4 stroke-[2.5]"></i>
+              <span>Download Admin APK (Free)</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div class="lg:col-span-7 space-y-4">
+            <p class="font-poppins font-normal text-dimWhite text-sm leading-relaxed">
+              Store chalane ke liye ab aapko laptop ya technical knowledge ki zarurat nahi! Free <span class="text-white font-semibold">SheetStore Admin Android APK</span> se aap apne phone se hi:
+            </p>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
+              <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80 flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center shrink-0">
+                  <i data-lucide="edit-3" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h5 class="text-xs font-bold text-white">Instant Price Change</h5>
+                  <p class="text-[11px] text-dimWhite mt-0.5">Phone me price badla, website par instant update.</p>
+                </div>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80 flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
+                  <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h5 class="text-xs font-bold text-white">Add New Products</h5>
+                  <p class="text-[11px] text-dimWhite mt-0.5">1-click me photo, title aur price add karein.</p>
+                </div>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80 flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
+                  <i data-lucide="bell" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h5 class="text-xs font-bold text-white">Live Order Notifications</h5>
+                  <p class="text-[11px] text-dimWhite mt-0.5">Har naye order par WhatsApp notification &amp; customer chat.</p>
+                </div>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80 flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center shrink-0">
+                  <i data-lucide="palette" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <h5 class="text-xs font-bold text-white">1-Click Theme Switch</h5>
+                  <p class="text-[11px] text-dimWhite mt-0.5">Cyber Blue se Vedic Gold ya Saree Studio me switch karein.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3 pt-3">
+              <a href="downloads/SheetStore-Admin.apk" download 
+                 class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold transition border border-slate-700">
+                <i data-lucide="smartphone" class="w-4 h-4 text-cyan-400"></i>
+                <span>Direct Download APK (v2.1)</span>
+              </a>
+              <span class="text-xs text-dimWhite">✓ Verified Safe &bull; No PlayStore Fee Required</span>
+            </div>
+          </div>
+
+          <div class="lg:col-span-5 flex justify-center">
+            <!-- Mobile App Showcase Card Mockup -->
+            <div class="w-full max-w-[320px] rounded-[32px] p-4 bg-gradient-to-b from-slate-800 via-slate-900 to-slate-950 border-2 border-slate-700 shadow-2xl relative overflow-hidden">
+              <div class="w-32 h-4 bg-slate-800 rounded-full mx-auto mb-4"></div>
+              
+              <div class="rounded-2xl bg-slate-950 p-4 border border-slate-800 space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <div class="flex items-center gap-2">
+                    <span class="w-7 h-7 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xs font-bold">SS</span>
+                    <span class="text-xs font-bold text-white">SheetStore Admin</span>
+                  </div>
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                </div>
+
+                <div class="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800">
+                  <div class="text-[10px] text-dimWhite uppercase tracking-wider">Live Revenue (Today)</div>
+                  <div class="text-lg font-bold text-gradient mt-0.5">₹14,990</div>
+                </div>
+
+                <div class="space-y-2">
+                  <div class="text-[10px] text-dimWhite uppercase tracking-wider font-bold">Quick Mobile Actions</div>
+                  <div class="flex items-center justify-between p-2 rounded-lg bg-slate-900 text-xs">
+                    <span class="text-dimWhite">Active Theme:</span>
+                    <span class="text-cyan-400 font-semibold font-mono">Cyber Blue</span>
+                  </div>
+                  <div class="flex items-center justify-between p-2 rounded-lg bg-slate-900 text-xs">
+                    <span class="text-dimWhite">Products In Sheet:</span>
+                    <span class="text-emerald-400 font-semibold font-mono">24 Synced</span>
+                  </div>
+                  <div class="flex items-center justify-between p-2 rounded-lg bg-slate-900 text-xs">
+                    <span class="text-dimWhite">Sheet Status:</span>
+                    <span class="text-emerald-400 font-bold flex items-center gap-1">
+                      <i data-lucide="check-circle" class="w-3 h-3"></i> Verified
+                    </span>
+                  </div>
+                </div>
+
+                <div class="pt-2">
+                  <div class="w-full py-2 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-[11px] font-bold text-center">
+                    📱 Direct Phone Management
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- WHOLE SYSTEM FREE ARCHITECTURE BANNER -->
+    <div class="mt-16 p-8 sm:p-12 rounded-[28px] bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 border border-cyan-500/30 relative overflow-hidden shadow-2xl">
+      <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      
+      <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/30 mb-3">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+            <span>Zero Recurring Overhead</span>
+          </div>
+          <h3 class="font-poppins font-black text-2xl sm:text-4xl text-white">
+            Whole System 100% Free Lifetime
+          </h3>
+          <p class="font-poppins font-normal text-dimWhite text-sm max-w-2xl mt-2 leading-relaxed">
+            Frontend Hosting: ₹0 | Database &amp; API: ₹0 | Admin Mobile App: ₹0 | Payment Commission: 0% — Lifetime ka total recurring kharcha exactly <span class="text-cyan-400 font-bold">₹0.00</span> hai.
+          </p>
+        </div>
+
+        <!-- 4 Zero Cost Pillars Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full lg:w-auto shrink-0">
+          <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-center">
+            <span class="text-[10px] text-dimWhite block uppercase font-mono">Frontend</span>
+            <span class="text-sm font-bold text-white mt-0.5 block">GitHub</span>
+            <span class="text-xs text-emerald-400 font-mono font-bold">₹0 / mo</span>
+          </div>
+          <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-center">
+            <span class="text-[10px] text-dimWhite block uppercase font-mono">Backend</span>
+            <span class="text-sm font-bold text-white mt-0.5 block">Google Sheet</span>
+            <span class="text-xs text-emerald-400 font-mono font-bold">₹0 / mo</span>
+          </div>
+          <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-center">
+            <span class="text-[10px] text-dimWhite block uppercase font-mono">Control</span>
+            <span class="text-sm font-bold text-white mt-0.5 block">Admin APK</span>
+            <span class="text-xs text-emerald-400 font-mono font-bold">₹0 Free</span>
+          </div>
+          <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-center">
+            <span class="text-[10px] text-dimWhite block uppercase font-mono">Payments</span>
+            <span class="text-sm font-bold text-white mt-0.5 block">Direct UPI</span>
+            <span class="text-xs text-cyan-400 font-mono font-bold">0% Cut</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ========================================================
+       5. GOOGLE SHEET BACKEND DATABASE & LIVE INVOICING SECTION
+       ======================================================== -->
+  <section class="py-16 sm:py-24 max-w-7xl mx-auto px-6 sm:px-12 flex md:flex-row flex-col-reverse items-center gap-12 relative overflow-hidden">
+    
+    <!-- Left Column: Realistic Interactive Google Sheet Backend Database Window -->
+    <div class="flex-1 flex items-center justify-center relative w-full">
+      
+      <!-- Glowing Background Gradients -->
+      <div class="absolute z-[0] -left-10 top-0 w-[60%] h-[60%] rounded-full white__gradient opacity-20 pointer-events-none"></div>
+      <div class="absolute z-[0] -left-10 bottom-0 w-[60%] h-[60%] rounded-full blue__gradient opacity-40 pointer-events-none"></div>
+
+      <!-- Google Sheet Mockup Container -->
+      <div class="w-full max-w-[540px] rounded-2xl bg-slate-900/90 border border-emerald-500/30 backdrop-blur-xl shadow-2xl p-4 sm:p-5 relative z-10 hover:border-emerald-400 transition duration-300">
+        
+        <!-- Sheet Header Bar -->
+        <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
+          <div class="flex items-center gap-2.5">
+            <!-- Google Sheet SVG Icon -->
+            <div class="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+              <svg class="w-4 h-4 shrink-0" viewBox="0 0 48 48">
+                <path fill="#0F9D58" d="M37,45H11c-2.2,0-4-1.8-4-4V7c0-2.2,1.8-4,4-4h18l12,12v26C41,43.2,39.2,45,37,45z"/>
+                <path fill="#87CEAC" d="M29,3v12h12L29,3z"/>
+                <path fill="#ffffff" d="M14,21h20v18H14V21z"/>
+                <path fill="#0F9D58" d="M16,23h6v4h-6V23z M24,23h8v4h-8V23z M16,29h6v4h-6V29z M24,29h8v4h-8V29z M16,35h6v4h-6V35z M24,35h8v4h-8V35z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs font-bold text-white font-poppins">SheetStore_Master_Backend</span>
+                <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono">Google Cloud</span>
+              </div>
+              <p class="text-[10px] text-dimWhite">All changes autosaved to Drive &bull; Free Database</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-[10px] text-emerald-400 font-mono font-bold">API Connected</span>
+          </div>
+        </div>
+
+        <!-- Formula Bar Mockup -->
+        <div class="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800/80 mb-3 text-[11px] font-mono text-dimWhite">
+          <span class="text-emerald-400 font-bold">fx</span>
+          <span class="text-slate-500">|</span>
+          <span class="text-cyan-300">=APPSCRIPT_WEBHOOK(Orders!A:G, "INSTANT_SYNC")</span>
+        </div>
+
+        <!-- Sheet Table Grid -->
+        <div class="overflow-x-auto rounded-lg border border-slate-800 bg-slate-950/80">
+          <table class="w-full text-left text-[11px] font-mono">
+            <thead>
+              <tr class="bg-slate-900/90 text-dimWhite border-b border-slate-800 text-[10px] uppercase">
+                <th class="p-2 border-r border-slate-800">#</th>
+                <th class="p-2 border-r border-slate-800">Title</th>
+                <th class="p-2 border-r border-slate-800">Category</th>
+                <th class="p-2 border-r border-slate-800">Price</th>
+                <th class="p-2">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/60 text-slate-300">
+              <tr class="hover:bg-slate-900/50 transition">
+                <td class="p-2 text-cyan-400 font-bold border-r border-slate-800/60">01</td>
+                <td class="p-2 font-medium text-white border-r border-slate-800/60">AI Prompts Mastery</td>
+                <td class="p-2 text-dimWhite border-r border-slate-800/60">Digital Bundle</td>
+                <td class="p-2 font-bold text-emerald-400 border-r border-slate-800/60">₹499</td>
+                <td class="p-2"><span class="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[9px] font-bold">LIVE ✓</span></td>
+              </tr>
+              <tr class="hover:bg-slate-900/50 transition">
+                <td class="p-2 text-cyan-400 font-bold border-r border-slate-800/60">02</td>
+                <td class="p-2 font-medium text-white border-r border-slate-800/60">SaaS Website Source Code</td>
+                <td class="p-2 text-dimWhite border-r border-slate-800/60">Software/ZIP</td>
+                <td class="p-2 font-bold text-emerald-400 border-r border-slate-800/60">₹999</td>
+                <td class="p-2"><span class="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[9px] font-bold">LIVE ✓</span></td>
+              </tr>
+              <tr class="hover:bg-slate-900/50 transition">
+                <td class="p-2 text-cyan-400 font-bold border-r border-slate-800/60">03</td>
+                <td class="p-2 font-medium text-white border-r border-slate-800/60">Cinematic Lightroom LUTs</td>
+                <td class="p-2 text-dimWhite border-r border-slate-800/60">Presets/Drive</td>
+                <td class="p-2 font-bold text-emerald-400 border-r border-slate-800/60">₹299</td>
+                <td class="p-2"><span class="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[9px] font-bold">LIVE ✓</span></td>
+              </tr>
+              <tr class="hover:bg-slate-900/50 transition">
+                <td class="p-2 text-cyan-400 font-bold border-r border-slate-800/60">04</td>
+                <td class="p-2 font-medium text-white border-r border-slate-800/60">E-Commerce Playbook</td>
+                <td class="p-2 text-dimWhite border-r border-slate-800/60">E-Book/PDF</td>
+                <td class="p-2 font-bold text-emerald-400 border-r border-slate-800/60">₹199</td>
+                <td class="p-2"><span class="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[9px] font-bold">LIVE ✓</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Sheet Bottom Tabs -->
+        <div class="flex items-center gap-1 mt-3 pt-2 border-t border-slate-800 text-[10px] font-mono">
+          <span class="px-2.5 py-1 rounded-t bg-emerald-500/20 text-emerald-300 font-bold border-b-2 border-emerald-400 flex items-center gap-1">
+            <i data-lucide="table" class="w-3 h-3"></i> Products_List
+          </span>
+          <span class="px-2.5 py-1 rounded-t text-dimWhite hover:text-white transition flex items-center gap-1">
+            <i data-lucide="shopping-cart" class="w-3 h-3"></i> Orders_Log (9)
+          </span>
+          <span class="px-2.5 py-1 rounded-t text-dimWhite hover:text-white transition flex items-center gap-1">
+            <i data-lucide="settings" class="w-3 h-3"></i> Store_Config
+          </span>
+        </div>
+
+        <!-- Live Metrics Badges Over Sheet -->
+        <div class="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-slate-800/80">
+          <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0">
+              ₹0
+            </div>
+            <div>
+              <span class="text-[9px] text-dimWhite block uppercase">Database Cost</span>
+              <span class="text-xs font-bold text-white">100% Free Forever</span>
+            </div>
+          </div>
+
+          <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-xs shrink-0">
+              ⚡
+            </div>
+            <div>
+              <span class="text-[9px] text-dimWhite block uppercase">Sync Speed</span>
+              <span class="text-xs font-bold text-white">Instant Cloud Sync</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Right Column: Info & Download App -->
+    <div class="flex-1 flex flex-col justify-center">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold mb-4 w-fit">
+        <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 48 48"><path fill="#0F9D58" d="M37,45H11c-2.2,0-4-1.8-4-4V7c0-2.2,1.8-4,4-4h18l12,12v26C41,43.2,39.2,45,37,45z"/><path fill="#87CEAC" d="M29,3v12h12L29,3z"/><path fill="#ffffff" d="M14,21h20v18H14V21z"/><path fill="#0F9D58" d="M16,23h6v4h-6V23z M24,23h8v4h-8V23z M16,29h6v4h-6V29z M24,29h8v4h-8V29z M16,35h6v4h-6V35z M24,35h8v4h-8V35z"/></svg>
+        <span>Google Cloud Powered Backend</span>
+      </div>
+      <h2 class="font-poppins font-bold text-3xl sm:text-5xl text-white leading-tight">
+        Google Sheet ko banayein apna <br class="sm:block hidden" />
+        <span class="text-gradient">Free Backend Database.</span>
+      </h2>
+      <p class="font-poppins font-normal text-dimWhite text-sm sm:text-base max-w-[480px] mt-6 leading-relaxed">
+        Na MySQL database khareedna, na complex cloud servers ka bill bharna. Google Sheet me bas naya product, price ya digital download link daliye — website par turant live update hoga! Customer ka naam, mobile number, aur payment UTR number automatic save hota hai.
+      </p>
+
+      <!-- App Badges / Direct APK & Sheet Link -->
+      <div class="flex flex-wrap items-center gap-4 mt-8">
+        <a href="downloads/SheetStore-Admin.apk" download 
+           class="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-cyan-400 text-white text-xs font-semibold transition shadow-md">
+          <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="#3DDC84"><path d="M17.523 15.34c-.436 0-.79-.354-.79-.79 0-.437.354-.79.79-.79.436 0 .79.353.79.79 0 .436-.354.79-.79.79m-11.046 0c-.437 0-.79-.354-.79-.79 0-.437.353-.79.79-.79.436 0 .79.353.79.79 0 .436-.354.79-.79.79m11.405-6.02l1.997-3.46a.416.416 0 00-.152-.567.416.416 0 00-.568.152l-2.023 3.504A12.78 12.78 0 0012 7.915c-1.82 0-3.518.384-5.136 1.054L4.84 5.465a.416.416 0 00-.568-.152.416.416 0 00-.152.567l1.997 3.46C2.688 11.286 0 15.34 0 20.08h24c0-4.74-2.688-8.794-6.118-10.76"/></svg>
+          <div class="text-left">
+            <span class="text-[9px] text-dimWhite block uppercase">Download APK (v1.0.2)</span>
+            <span class="font-bold text-white">Android Admin App</span>
+          </div>
+        </a>
+
+        <a href="https://docs.google.com/spreadsheets/d/1UrKX7co3In04ijuxYP8HUgHYVD8YVgQOoJL41itO1uc/copy" target="_blank"
+           class="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 hover:border-emerald-400 text-white text-xs font-semibold transition shadow-md">
+          <svg class="w-5 h-5 shrink-0" viewBox="0 0 48 48"><path fill="#0F9D58" d="M37,45H11c-2.2,0-4-1.8-4-4V7c0-2.2,1.8-4,4-4h18l12,12v26C41,43.2,39.2,45,37,45z"/><path fill="#87CEAC" d="M29,3v12h12L29,3z"/><path fill="#ffffff" d="M14,21h20v18H14V21z"/><path fill="#0F9D58" d="M16,23h6v4h-6V23z M24,23h8v4h-8V23z M16,29h6v4h-6V29z M24,29h8v4h-8V29z M16,35h6v4h-6V35z M24,35h8v4h-8V35z"/></svg>
+          <div class="text-left">
+            <span class="text-[9px] text-dimWhite block uppercase">1-Click Copy</span>
+            <span class="font-bold text-white">Google Sheet Template</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ========================================================
+       6. DIGITAL PRODUCTS & MULTI-NICHE LIVE DEMOS SECTION
+       ======================================================== -->
+  <section id="demos" class="py-16 sm:py-24 max-w-7xl mx-auto px-6 sm:px-12 flex md:flex-row flex-col items-center gap-12 relative overflow-hidden">
+    
+    <!-- Left Column: Title & Demo Selector Trigger -->
+    <div class="flex-1 flex flex-col justify-center">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold mb-4 w-fit">
+        <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+        <span>Multi-Niche Ready Storefronts</span>
+      </div>
+      <h2 class="font-poppins font-bold text-3xl sm:text-5xl text-white leading-tight">
+        Apne business ke liye <br class="sm:block hidden" />
+        <span class="text-gradient">Ready-made Live Demo chunein.</span>
+      </h2>
+      <p class="font-poppins font-normal text-dimWhite text-sm sm:text-base max-w-[480px] mt-6 leading-relaxed">
+        Chahe aap software, ebooks, courses ya digital goods bechte hon, ya traditional sarees, clothing aur boutique fashion — SheetStore Pro ke paas dono ke liye ready-made high-converting storefronts hain.
+      </p>
+
+      <!-- 3 Live Demo Buttons -->
+      <div class="flex flex-wrap gap-2.5 mt-8">
+        <button onclick="openDemoSelectorModal()" 
+                class="px-5 py-3 rounded-xl bg-blue-gradient text-primary font-poppins font-bold text-xs shadow-xl shadow-cyan-500/25 transition active:scale-95 flex items-center justify-center gap-2">
+          <i data-lucide="eye" class="w-4 h-4 stroke-[2.5]"></i>
+          <span>Live Store Demos ➔</span>
+        </button>
+        <a href="saree-demo.html" target="_blank"
+           class="px-4 py-3 rounded-xl bg-slate-900 border border-[#D4AF37]/50 hover:border-[#D4AF37] text-[#F5DE7A] font-poppins font-semibold text-xs flex items-center justify-center gap-1.5 transition">
+          <span>🥻 NOOLAM Saree</span>
+          <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+        </a>
+        <a href="vastu-demo.html" target="_blank"
+           class="px-4 py-3 rounded-xl bg-gradient-to-r from-[#171A3A] to-slate-900 border border-[#E9B44C]/60 hover:border-[#E9B44C] text-[#F6D58E] font-poppins font-semibold text-xs flex items-center justify-center gap-1.5 transition shadow-lg">
+          <span>🕉️ वास्तु ब्रह्मांड</span>
+          <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Right Column: Digital Products & Multi-Store Interactive Showcase -->
+    <div class="flex-1 flex items-center justify-center relative w-full">
+      <div class="absolute z-[0] w-[60%] h-[60%] right-0 bottom-0 blue__gradient opacity-40 pointer-events-none"></div>
+
+      <div class="w-full max-w-[520px] space-y-4 relative z-10">
+
+        <!-- Store Type 1: Digital Products & Software Downloads -->
+        <div class="p-5 rounded-2xl bg-slate-900/90 border border-cyan-500/30 backdrop-blur-xl shadow-xl hover:border-cyan-400 transition group cursor-pointer"
+             onclick="openDemoSelectorModal()">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold">
+                <i data-lucide="package" class="w-4 h-4"></i>
+              </span>
+              <div>
+                <span class="text-[10px] text-cyan-400 uppercase font-mono font-bold block">Theme 01 &bull; Instant Delivery</span>
+                <h4 class="text-sm font-bold text-white font-poppins">Digital Products &amp; Software Store</h4>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 text-[10px] font-bold border border-cyan-500/20">
+              Demo Active ➔
+            </span>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2 text-center text-[10px] font-mono">
+            <div class="p-2 rounded-lg bg-slate-950 border border-slate-800">
+              <i data-lucide="file-code" class="w-3.5 h-3.5 text-cyan-400 mx-auto mb-1"></i>
+              <span class="text-white block font-bold">Source Code</span>
+              <span class="text-[8px] text-dimWhite">ZIP Download</span>
+            </div>
+            <div class="p-2 rounded-lg bg-slate-950 border border-slate-800">
+              <i data-lucide="book-open" class="w-3.5 h-3.5 text-emerald-400 mx-auto mb-1"></i>
+              <span class="text-white block font-bold">E-Books</span>
+              <span class="text-[8px] text-dimWhite">PDF Link</span>
+            </div>
+            <div class="p-2 rounded-lg bg-slate-950 border border-slate-800">
+              <i data-lucide="video" class="w-3.5 h-3.5 text-purple-400 mx-auto mb-1"></i>
+              <span class="text-white block font-bold">Masterclasses</span>
+              <span class="text-[8px] text-dimWhite">Drive Access</span>
+            </div>
+          </div>
+
+          <div class="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
+            <span class="text-dimWhite flex items-center gap-1">
+              <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i> Auto Delivery Link on Payment
+            </span>
+            <span class="text-cyan-400 font-bold">₹0 Hosting</span>
+          </div>
+        </div>
+
+        <!-- Store Type 2: Luxury Fashion & Physical Goods Store (NOOLAM Saree Studio) -->
+        <a href="saree-demo.html" target="_blank"
+           class="p-5 rounded-2xl bg-gradient-to-br from-slate-900/90 to-[#1c140a]/90 border border-[#D4AF37]/40 backdrop-blur-xl shadow-xl hover:border-[#D4AF37] transition group block">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-8 h-8 rounded-lg bg-[#D4AF37]/20 text-[#F5DE7A] flex items-center justify-center font-bold">
+                🥻
+              </span>
+              <div>
+                <span class="text-[10px] text-[#F5DE7A] uppercase font-mono font-bold block">Theme 02 &bull; Boutique &amp; Physical</span>
+                <h4 class="text-sm font-bold text-white font-poppins">NOOLAM Saree Studio (Luxury Store)</h4>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded-full bg-[#D4AF37]/15 text-[#F5DE7A] text-[10px] font-bold border border-[#D4AF37]/30 flex items-center gap-1">
+              <span>Live Store</span>
+              <i data-lucide="arrow-up-right" class="w-3 h-3"></i>
+            </span>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="w-16 h-14 rounded-lg bg-slate-950 border border-amber-900/40 overflow-hidden shrink-0">
+              <img src="assets/images/saree/01-hero.png" alt="Saree Studio Preview" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs text-slate-300 line-clamp-1 font-medium">Boutique, Jewelry, Clothing &amp; Physical Products</p>
+              <p class="text-[10px] text-dimWhite mt-0.5">Customer cart + Direct WhatsApp order flow + UPI checkout.</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- Feature Capsule: 100% Free Architecture Summary -->
+        <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between text-xs">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span class="text-dimWhite font-mono">1-Click Theme Switcher:</span>
+            <span class="text-white font-bold">Digital &bull; Physical &bull; Courses</span>
+          </div>
+          <span class="text-emerald-400 font-mono font-bold text-[11px]">Free Admin APK</span>
+        </div>
+
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ========================================================
+       7. HOOBANK TESTIMONIALS SECTION
+       ======================================================== -->
+  <section class="py-16 sm:py-24 max-w-7xl mx-auto px-6 sm:px-12 relative">
+    
+    <div class="w-full flex justify-between items-md-center md:flex-row flex-col sm:mb-16 mb-8 relative z-[1]">
+      <h2 class="font-poppins font-bold text-3xl sm:text-5xl text-white leading-tight">
+        Store owners kya kehte hain <br class="sm:block hidden" />
+        <span class="text-gradient">SheetStore Pro ke bare mein.</span>
+      </h2>
+      <div class="w-full md:mt-0 mt-6">
+        <p class="font-poppins font-normal text-dimWhite text-sm sm:text-base text-left max-w-[450px]">
+          100+ digital creators, boutique owners aur consultants jo monthly Shopify fees band karke SheetStore par shift ho chuke hain.
+        </p>
+      </div>
+    </div>
+
+    <!-- 3 Feedback Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 relative z-[1]">
+      
+      <!-- Card 1 -->
+      <div class="flex flex-col justify-between px-8 py-10 rounded-[20px] feedback-card border border-slate-800">
+        <div>
+          <img src="assets/images/hoobank/quotes.svg" alt="Quotes" class="w-10 h-7 object-contain mb-6" />
+          <p class="font-poppins font-normal text-sm sm:text-base text-white leading-relaxed mb-6">
+            "Shopify par har mahine ₹2,400 lag rahe the bina kisi wajah ke. SheetStore par maine apna Notion templates store banaya — zero monthly bills and Google Sheet integration is so smooth!"
+          </p>
+        </div>
+        <div class="flex flex-row items-center">
+          <img src="assets/images/hoobank/people01.png" alt="Ankit Sharma" class="w-12 h-12 rounded-full" />
+          <div class="flex flex-col ml-4">
+            <h4 class="font-poppins font-semibold text-base text-white">Ankit Sharma</h4>
+            <p class="font-poppins font-normal text-xs text-dimWhite">Digital Creator, Pune</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="flex flex-col justify-between px-8 py-10 rounded-[20px] feedback-card border border-slate-800">
+        <div>
+          <img src="assets/images/hoobank/quotes.svg" alt="Quotes" class="w-10 h-7 object-contain mb-6" />
+          <p class="font-poppins font-normal text-sm sm:text-base text-white leading-relaxed mb-6">
+            "NOOLAM Saree Showcase template dekh kar mere customers dang reh gaye! Clothes rail pe saree hanging effect aur 10% bundle checkout ne hamari direct UPI sales 3x kar di."
+          </p>
+        </div>
+        <div class="flex flex-row items-center">
+          <img src="assets/images/hoobank/people02.png" alt="Priya Sundaram" class="w-12 h-12 rounded-full" />
+          <div class="flex flex-col ml-4">
+            <h4 class="font-poppins font-semibold text-base text-white">Priya Sundaram</h4>
+            <p class="font-poppins font-normal text-xs text-dimWhite">Boutique Owner, Chennai</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="flex flex-col justify-between px-8 py-10 rounded-[20px] feedback-card border border-slate-800">
+        <div>
+          <img src="assets/images/hoobank/quotes.svg" alt="Quotes" class="w-10 h-7 object-contain mb-6" />
+          <p class="font-poppins font-normal text-sm sm:text-base text-white leading-relaxed mb-6">
+            "Vedic Gold theme mere Vastu aur gemstone consultancy ke liye perfect fit hai. Android Admin app pe payment aate hi notification aa jata hai, zero manual checking!"
+          </p>
+        </div>
+        <div class="flex flex-row items-center">
+          <img src="assets/images/hoobank/people03.png" alt="Vikram Mehra" class="w-12 h-12 rounded-full" />
+          <div class="flex flex-col ml-4">
+            <h4 class="font-poppins font-semibold text-base text-white">Vikram Mehra</h4>
+            <p class="font-poppins font-normal text-xs text-dimWhite">Consultant, Jaipur</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ========================================================
+       8. PRICING SECTION (The ₹499 Lifetime Access Plan)
+       ======================================================== -->
+  <section id="pricing" class="py-16 sm:py-24 max-w-5xl mx-auto px-6 sm:px-12 relative z-10">
+    <div class="text-center mb-12">
+      <span class="text-gradient uppercase tracking-widest text-xs font-bold font-poppins block mb-2">
+        Simple &amp; Transparent
+      </span>
+      <h2 class="font-poppins font-black text-3xl sm:text-5xl text-white">
+        Sirf Ek Baar Pay Karein. <span class="text-gradient">Lifetime Free Chalayein.</span>
+      </h2>
+      <p class="text-dimWhite text-sm mt-3 max-w-xl mx-auto">
+        Koi monthly renewal nahi, koi hidden fees nahi. Direct UPI QR scan karke 2 minute me shuru karein.
+      </p>
+    </div>
+
+    <!-- Pricing Card -->
+    <div class="bg-slate-900/90 rounded-3xl border-2 border-cyan-500/50 p-8 sm:p-12 shadow-2xl relative overflow-hidden">
+      <div class="absolute -top-24 -right-24 w-60 h-60 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-8 pb-8 border-b border-slate-800">
+        <div>
+          <span class="px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 font-bold text-xs uppercase tracking-wider">
+            All-In-One Pro Deal
+          </span>
+          <h3 class="font-poppins font-bold text-2xl sm:text-3xl text-white mt-3">SheetStore Complete Lifetime Suite</h3>
+          <p class="text-dimWhite text-xs sm:text-sm mt-1">Website Source Code + Google Sheet Backend + Android Admin APK</p>
+        </div>
+        <div class="text-left md:text-right">
+          <div class="flex items-baseline md:justify-end gap-2">
+            <span class="text-4xl sm:text-5xl font-black font-poppins text-white">₹499</span>
+            <span class="text-dimWhite text-sm line-through">₹2,999</span>
+          </div>
+          <span class="text-xs text-emerald-400 font-bold block mt-1">One-time payment • Lifetime Free</span>
+        </div>
+      </div>
+
+      <!-- Features Checklist Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-8 text-xs sm:text-sm text-dimWhite">
+        <div class="flex items-center gap-2.5">
+          <i data-lucide="check-circle-2" class="w-4 h-4 text-secondary shrink-0"></i>
+          <span>100% Free Lifetime Hosting (GitHub Pages)</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <i data-lucide="check-circle-2" class="w-4 h-4 text-secondary shrink-0"></i>
+          <span>Google Sheet Backend &bull; Phone se Update</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <i data-lucide="check-circle-2" class="w-4 h-4 text-secondary shrink-0"></i>
+          <span>Direct UPI QR + PhonePe / GPay Pay Modal</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <i data-lucide="check-circle-2" class="w-4 h-4 text-secondary shrink-0"></i>
+          <span>Instant WhatsApp Order Button with Customer Cart</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <i data-lucide="check-circle-2" class="w-4 h-4 text-secondary shrink-0"></i>
+          <span>5 Digital Store Themes + NOOLAM Saree Showcase</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <i data-lucide="check-circle-2" class="w-4 h-4 text-secondary shrink-0"></i>
+          <span>Android Admin Companion App (APK Included)</span>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <button onclick="openPaymentModal()" 
+              class="w-full py-4 rounded-xl bg-blue-gradient text-primary font-poppins font-black text-sm sm:text-base tracking-wide uppercase transition active:scale-95 shadow-xl shadow-cyan-500/25 flex items-center justify-center gap-2">
+        <i data-lucide="zap" class="w-5 h-5 fill-current"></i>
+        <span>Instant UPI Se Abhi Shuru Karein (Sirf ₹499) ➔</span>
+      </button>
+
+      <p class="text-center text-[11px] text-dimWhite mt-3">
+        100% Instant Delivery • 7-Day Money Back Guarantee if setup fails.
+      </p>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       9. HOOBANK CALL TO ACTION (CTA) SECTION
+       ======================================================== -->
+  <section class="py-12 max-w-7xl mx-auto px-6 sm:px-12 relative z-10">
+    <div class="flex md:flex-row flex-col justify-between items-center bg-black-gradient-2 rounded-[20px] box-shadow sm:p-14 p-8 border border-slate-800">
+      <div class="flex-1 flex flex-col">
+        <h2 class="font-poppins font-bold text-3xl sm:text-4xl text-white leading-tight">
+          Aaj hi apna store shuru karein!
+        </h2>
+        <p class="font-poppins font-normal text-dimWhite text-sm sm:text-base max-w-[470px] mt-4 leading-relaxed">
+          Google Sheet se chalne wali super fast e-commerce website banayein aur Shopify ke monthly kharche se aazaadi paayein.
+        </p>
+      </div>
+      <div class="flex items-center justify-center md:ml-10 ml-0 md:mt-0 mt-8">
+        <button onclick="openPaymentModal()" 
+                class="px-8 py-4 rounded-xl bg-blue-gradient text-primary font-poppins font-bold text-sm tracking-wide transition active:scale-95 shadow-xl shadow-cyan-500/25">
+          Get Started (₹499) ➔
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       10. FAQs SECTION
+       ======================================================== -->
+  <section id="faq" class="py-16 max-w-4xl mx-auto px-6 sm:px-12 relative z-10">
+    <div class="text-center mb-10">
+      <h2 class="font-poppins font-bold text-2xl sm:text-4xl text-white">Aksar Pooche Jaane Wale Sawal</h2>
+    </div>
+
+    <div class="space-y-3">
+      <!-- FAQ 1 -->
+      <div class="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 cursor-pointer" onclick="toggleFaq(this)">
+        <div class="flex items-center justify-between font-poppins font-semibold text-sm sm:text-base text-white">
+          <span>Kya sach me koi monthly hosting ya domain fee nahi hai?</span>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-secondary transition"></i>
+        </div>
+        <p class="text-xs sm:text-sm text-dimWhite mt-2 hidden leading-relaxed">
+          Haan bilkul! Yeh system GitHub Pages par host hota hai jo 100% free hai lifetime. Aapko koi hosting, server ya database ka monthly bill nahi bharna padta.
+        </p>
+      </div>
+
+      <!-- FAQ 2 -->
+      <div class="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 cursor-pointer" onclick="toggleFaq(this)">
+        <div class="flex items-center justify-between font-poppins font-semibold text-sm sm:text-base text-white">
+          <span>Google Sheet se product aur price kaise badalte hain?</span>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-secondary transition"></i>
+        </div>
+        <p class="text-xs sm:text-sm text-dimWhite mt-2 hidden leading-relaxed">
+          Aapko ek Google Sheet template milega jisme 'Products' aur 'Settings' tab hote hain. Aap apne phone me Google Sheet app se product ka naam ya price change karenge aur website par instant update ho jayega.
+        </p>
+      </div>
+
+      <!-- FAQ 3 -->
+      <div class="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 cursor-pointer" onclick="toggleFaq(this)">
+        <div class="flex items-center justify-between font-poppins font-semibold text-sm sm:text-base text-white">
+          <span>Customer se payment kaise aayegi?</span>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-secondary transition"></i>
+        </div>
+        <p class="text-xs sm:text-sm text-dimWhite mt-2 hidden leading-relaxed">
+          Website me direct Dynamic UPI QR code generator laga hai. Customer PhonePe, Google Pay, Paytm ya BHIM se direct aapke UPI ID par payment karega jisme 0% transaction fee lagti hai. Paisa seedha aapke bank account me aata hai.
+        </p>
+      </div>
+
+      <!-- FAQ 4: Digital Goods -->
+      <div class="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 cursor-pointer" onclick="toggleFaq(this)">
+        <div class="flex items-center justify-between font-poppins font-semibold text-sm sm:text-base text-white">
+          <span>Kya main E-books, Software aur Digital Products bech sakta hoon?</span>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-secondary transition"></i>
+        </div>
+        <p class="text-xs sm:text-sm text-dimWhite mt-2 hidden leading-relaxed">
+          Haan bilkul! SheetStore Pro digital downloads ke liye hi specially banaya gaya hai. Google Sheet me bas apne digital file (Drive/Zip) ka link daliye. Customer jaise hi payment karega, use screen par instant download link mil jayega aur WhatsApp receipt bhi chali jayegi.
+        </p>
+      </div>
+
+      <!-- FAQ 5: Mobile App -->
+      <div class="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 cursor-pointer" onclick="toggleFaq(this)">
+        <div class="flex items-center justify-between font-poppins font-semibold text-sm sm:text-base text-white">
+          <span>Android Admin App ka kya fayda hai?</span>
+          <i data-lucide="chevron-down" class="w-4 h-4 text-secondary transition"></i>
+        </div>
+        <p class="text-xs sm:text-sm text-dimWhite mt-2 hidden leading-relaxed">
+          Aapko package ke sath Free Android Companion App (APK) milti hai. Jab bhi website par naya order aayega, aapke mobile me sound &amp; vibration ke sath push notification aayegi. Aap mobile se hi 1-click me order verify kar sakte hain aur UPI QR ya logo update kar sakte hain.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       11. HOOBANK STYLE FOOTER
+       ======================================================== -->
+  <footer class="py-12 border-t border-slate-900 bg-[#00040f] relative z-10">
+    <div class="max-w-7xl mx-auto px-6 sm:px-12 flex flex-col md:flex-row justify-between items-center gap-8">
+      
+      <div class="flex flex-col items-center md:items-start">
+        <a href="#" class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-blue-gradient flex items-center justify-center text-primary font-bold">
+            <i data-lucide="layers" class="w-4 h-4"></i>
+          </div>
+          <span class="font-poppins font-black text-lg text-white">SheetStore<span class="text-gradient">Pro</span></span>
+        </a>
+        <p class="font-poppins text-xs text-dimWhite mt-2 text-center md:text-left">
+          Zero hosting, zero domain automated e-commerce system powered by Google Sheet.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-center gap-6 text-xs text-dimWhite font-medium">
+        <a href="#features" class="hover:text-secondary transition">Features</a>
+        <a href="javascript:void(0)" onclick="openDemoSelectorModal()" class="hover:text-secondary transition">Live Demos</a>
+        <a href="#pricing" class="hover:text-secondary transition">Pricing</a>
+        <a href="dashboard.html" class="hover:text-secondary transition">Store Launchpad</a>
+        <button onclick="openConfigModal()" class="hover:text-secondary flex items-center gap-1">
+          <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+          <span>Sheet Config</span>
+        </button>
+      </div>
+
+    </div>
+
+    <div class="max-w-7xl mx-auto px-6 sm:px-12 pt-8 mt-8 border-t border-slate-900 text-center text-xs text-dimWhite flex flex-col sm:flex-row justify-between items-center gap-2">
+      <p>&copy; 2026 SheetStore Pro &bull; Inspired by HooBank Design &bull; Powered by Google Sheets</p>
+      <p>Direct UPI &bull; 0% Fee &bull; 100% Free Lifetime Hosting</p>
+    </div>
+  </footer>
+
+  <!-- ========================================================
+       12. PAYMENT MODAL (₹499 UPI QR Checkout)
+       ======================================================== -->
+  <div id="paymentModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-lg w-full p-5 sm:p-7 relative shadow-2xl my-auto max-h-[94vh] overflow-y-auto">
+      <!-- Glow effect -->
+      <div class="absolute -top-20 -left-20 w-44 h-44 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-20 -right-20 w-44 h-44 bg-blue-500/15 rounded-full blur-3xl pointer-events-none"></div>
+
+      <button onclick="closePaymentModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white transition z-10 p-1">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- VIEW 1: PAYMENT & UTR SUBMISSION FORM -->
+      <div id="paymentFormView" class="space-y-4">
+        <div class="text-center">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold mb-2">
+            <span>⚡ Instant UPI Checkout</span>
+            <span class="text-slate-500">•</span>
+            <span class="text-emerald-400 font-extrabold">₹499 Lifetime Access</span>
+          </div>
+          <h3 class="font-poppins font-black text-xl text-white">Payment Karein &amp; Store Setup Unlock Karein</h3>
+          <p class="text-xs text-dimWhite mt-0.5">Apne manpasand UPI app se 1-Tap me pay karein ya QR scan karein</p>
+        </div>
+
+        <!-- PAYMENT METHOD SWITCHER TABS (1-Tap UPI Apps VS QR Code) -->
+        <div class="grid grid-cols-2 p-1 bg-slate-950/80 rounded-2xl border border-slate-800">
+          <button type="button" id="tabUpiAppsBtn" onclick="switchPaymentMethod('apps')"
+                  class="py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 bg-blue-600 text-white shadow-md">
+            <i data-lucide="smartphone" class="w-4 h-4"></i>
+            <span>📱 1-Tap UPI Apps</span>
+          </button>
+          <button type="button" id="tabQrCodeBtn" onclick="switchPaymentMethod('qr')"
+                  class="py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-400 hover:text-white">
+            <i data-lucide="qr-code" class="w-4 h-4"></i>
+            <span>📷 QR Code Scan</span>
+          </button>
+        </div>
+
+        <!-- SECTION A: 1-TAP UPI APP ICONS & BUTTONS -->
+        <div id="upiAppsSection" class="space-y-3">
+          <p class="text-[11px] font-semibold text-slate-300">Niche diye kisi bhi app par click karke direct ₹499 pay karein:</p>
+          <div class="grid grid-cols-2 gap-2.5">
+            <!-- 1. PhonePe -->
+            <button type="button" onclick="launchUpi('phonepe')"
+                    class="group p-3 rounded-2xl bg-gradient-to-br from-[#5f259f]/90 to-[#3b1266]/90 hover:from-[#6d2ab7] hover:to-[#4a1680] border border-purple-500/40 text-left transition active:scale-95 shadow-lg shadow-purple-950/30 flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-xl bg-white flex items-center justify-center shrink-0 shadow">
+                <span class="text-[#5f259f] font-black text-lg leading-none" style="font-family: Arial, sans-serif;">पे</span>
+              </div>
+              <div class="min-w-0">
+                <p class="text-xs font-black text-white leading-tight">PhonePe</p>
+                <p class="text-[10px] text-purple-200 truncate">1-Tap ₹499 Pay</p>
+              </div>
+            </button>
+
+            <!-- 2. Google Pay -->
+            <button type="button" onclick="launchUpi('gpay')"
+                    class="group p-3 rounded-2xl bg-slate-950/90 hover:bg-slate-800/90 border border-slate-700/80 hover:border-blue-400 text-left transition active:scale-95 shadow-lg flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-xl bg-white flex items-center justify-center shrink-0 shadow p-1.5">
+                <svg viewBox="0 0 24 24" class="w-full h-full">
+                  <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                  <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                  <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.17 0 9.99 0 12s.45 3.83 1.25 5.42l4.03-3.15z"/>
+                  <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                </svg>
+              </div>
+              <div class="min-w-0">
+                <p class="text-xs font-black text-white leading-tight">Google Pay</p>
+                <p class="text-[10px] text-slate-400 truncate">Fast UPI Pay</p>
+              </div>
+            </button>
+
+            <!-- 3. Paytm -->
+            <button type="button" onclick="launchUpi('paytm')"
+                    class="group p-3 rounded-2xl bg-gradient-to-br from-[#002E6E]/90 to-[#001838]/90 hover:from-[#003887] hover:to-[#00224d] border border-cyan-500/40 text-left transition active:scale-95 shadow-lg shadow-cyan-950/20 flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-xl bg-white flex items-center justify-center shrink-0 shadow p-1">
+                <span class="font-black text-[10px] tracking-tight leading-none" style="font-family: sans-serif;"><span style="color:#002E6E;">pay</span><span style="color:#00BAF2;">tm</span></span>
+              </div>
+              <div class="min-w-0">
+                <p class="text-xs font-black text-white leading-tight">Paytm UPI</p>
+                <p class="text-[10px] text-cyan-200 truncate">UPI / Wallet</p>
+              </div>
+            </button>
+
+            <!-- 4. BHIM / Other UPI Apps -->
+            <button type="button" onclick="launchUpi('generic')"
+                    class="group p-3 rounded-2xl bg-gradient-to-br from-emerald-950/90 to-teal-950/90 hover:from-emerald-900 hover:to-teal-900 border border-emerald-500/40 text-left transition active:scale-95 shadow-lg shadow-emerald-950/20 flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shrink-0 shadow text-slate-950 font-black text-xs font-mono">
+                UPI
+              </div>
+              <div class="min-w-0">
+                <p class="text-xs font-black text-white leading-tight">Other UPI Apps</p>
+                <p class="text-[10px] text-emerald-300 truncate">Cred, BHIM, etc.</p>
+              </div>
+            </button>
+          </div>
+
+          <!-- SUSPECT APP SECURITY EXPLANATION & SAFE FALLBACK -->
+          <div class="p-3.5 rounded-2xl bg-slate-950/90 border border-amber-500/30 text-left">
+            <div class="flex items-start gap-2.5">
+              <span class="text-base leading-none mt-0.5">🛡️</span>
+              <div class="space-y-1.5 flex-1">
+                <p class="text-[11px] font-bold text-amber-300 leading-tight">
+                  PhonePe / GPay me "Suspect App" ya warning kyu dikhti hai?
+                </p>
+                <p class="text-[10.5px] text-slate-300 leading-relaxed">
+                  Browser se UPI app par redirect hone par banking apps automated external security warning dikhate hain. <strong class="text-white">Yeh payment 100% safe hai.</strong>
+                </p>
+                <div class="pt-1 flex flex-wrap items-center gap-2">
+                  <span class="text-[10px] text-amber-200 font-semibold">Bina warning ke direct pay karein:</span>
+                  <button type="button" onclick="copyUpiId()" class="px-2.5 py-1 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-[10.5px] font-bold flex items-center gap-1 transition">
+                    <i data-lucide="copy" class="w-3 h-3"></i>
+                    <span id="copyUpiBtnText">Copy UPI: 9907522413@ybl</span>
+                  </button>
+                </div>
+                <p class="text-[10px] text-slate-400 leading-tight">
+                  👉 PhonePe / Google Pay kholein ➔ <strong>'Pay to UPI ID'</strong> par click karein ➔ <strong id="safeUpiIdText">9907522413@ybl</strong> paste karke ₹499 bhej dein.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION B: QR CODE DISPLAY (FOR DESKTOP / 2ND PHONE SCAN) -->
+        <div id="qrCodeSection" class="hidden text-center space-y-3">
+          <div class="bg-white p-3 rounded-2xl text-center max-w-[210px] mx-auto shadow-inner">
+            <img id="paymentQrCodeImg" 
+                 src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=9907522413@ybl&pn=SheetStore&am=499&cu=INR&tn=SheetStoreOrder" 
+                 alt="UPI QR Code" class="w-40 h-40 mx-auto rounded-lg" />
+            <p class="text-xs font-bold text-slate-900 font-poppins mt-1">Amount: ₹499 (Lifetime Access)</p>
+            <div class="flex items-center justify-center gap-1.5 mt-0.5">
+              <span id="qrUpiTextDisplay" class="text-[10px] text-slate-600 font-mono font-bold">UPI: 9907522413@ybl</span>
+              <button type="button" onclick="copyUpiId()" class="text-[9px] px-1.5 py-0.5 rounded bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold">Copy</button>
+            </div>
+          </div>
+          <p class="text-[11px] text-dimWhite">Kisi bhi doosre phone se PhonePe, GPay ya Paytm se QR scan karein.</p>
+        </div>
+
+        <!-- POST-PAYMENT RETURN BANNER (Appears when user switches back from UPI app) -->
+        <div id="postPaymentBanner" class="hidden p-3 rounded-xl bg-cyan-500/15 border border-cyan-400/40 text-cyan-200 text-xs text-left flex items-start gap-2">
+          <i data-lucide="check-circle-2" class="w-4 h-4 text-cyan-400 shrink-0 mt-0.5"></i>
+          <div>
+            <p class="font-bold text-white">Payment complete ho gaya?</p>
+            <p class="text-[11px] text-cyan-300">Transaction history se mila <strong>12-digit UTR</strong> niche enter karke dashboard unlock karein! 👇</p>
+          </div>
+        </div>
+
+        <!-- Validation Alert -->
+        <div id="paymentErrorMsg" class="hidden p-2.5 rounded-xl bg-red-500/15 border border-red-500/40 text-red-300 text-xs text-left flex items-start gap-2">
+          <i data-lucide="alert-triangle" class="w-4 h-4 text-red-400 shrink-0 mt-0.5"></i>
+          <span id="paymentErrorText">Error message</span>
+        </div>
+
+        <!-- Customer Details Form -->
+        <div class="space-y-2.5 text-left pt-1">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Aapka Naam *</label>
+            <input type="text" id="buyerName" placeholder="e.g. Rahul Sharma" 
+                   class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-cyan-400" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-300 mb-1">WhatsApp Mobile Number *</label>
+            <input type="tel" id="buyerPhone" placeholder="10-digit WhatsApp number (e.g. 9876543210)" maxlength="10"
+                   class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-cyan-400" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-300 mb-1">Email Address *</label>
+            <input type="email" id="buyerEmail" placeholder="e.g. rahul@gmail.com" 
+                   class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-cyan-400" />
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-[11px] font-semibold text-amber-300">12-Digit UPI UTR / Ref No. *</label>
+              <span class="text-[9px] text-slate-400">Payment hone ke baad milta hai</span>
+            </div>
+            <input type="text" id="buyerUtr" placeholder="12-digit UTR (e.g. 412984920194)" maxlength="12"
+                   class="w-full px-3.5 py-2.5 bg-slate-950 border border-amber-500/60 focus:border-cyan-400 rounded-xl text-xs text-white font-mono tracking-wider focus:outline-none transition" />
+            <p class="text-[10px] text-slate-400 mt-1 leading-tight">
+              🔒 <span class="text-amber-400 font-medium">Bina verified payment aur 12-digit UTR ke dashboard unlock nahi hoga.</span> PhonePe/GPay par transaction receipt se 12-digit UTR dekhein.
+            </p>
+          </div>
+        </div>
+
+        <button onclick="submitOrderForVerification()" id="btnSubmitPayment"
+                class="w-full py-3.5 rounded-xl bg-blue-gradient text-primary font-poppins font-black text-xs uppercase tracking-wide transition shadow-lg shadow-cyan-500/20 active:scale-95 flex items-center justify-center gap-2">
+          <i data-lucide="shield-check" class="w-4 h-4 stroke-[2.5]"></i>
+          <span>Payment Confirm Karein &amp; UTR Verify Karein 🔒</span>
+        </button>
+      </div>
+
+      <!-- VIEW 2: REAL-TIME VERIFICATION & POLLING SCREEN -->
+      <div id="paymentVerificationView" class="hidden text-center py-2">
+        <div class="relative w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-25"></span>
+          <div class="relative inline-flex rounded-full h-14 w-14 bg-cyan-500/20 border-2 border-cyan-400 items-center justify-center text-cyan-300">
+            <i data-lucide="loader-2" class="w-7 h-7 animate-spin"></i>
+          </div>
+        </div>
+
+        <h3 class="font-poppins font-bold text-lg text-white mb-1">Payment Verification In Progress...</h3>
+        <p class="text-xs text-dimWhite mb-4">Aapka 12-digit UTR Google Sheet aur Banking system se match ho raha hai.</p>
+
+        <!-- Summary Card -->
+        <div class="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 text-left space-y-2 mb-4 font-mono text-xs">
+          <div class="flex justify-between items-center text-slate-300">
+            <span class="text-slate-400">Order ID:</span>
+            <span id="verifOrderId" class="font-bold text-white">#ORD-000000</span>
+          </div>
+          <div class="flex justify-between items-center text-slate-300">
+            <span class="text-slate-400">Customer:</span>
+            <span id="verifCustomerName" class="font-semibold text-slate-200">Rahul</span>
+          </div>
+          <div class="flex justify-between items-center text-slate-300">
+            <span class="text-slate-400">Amount:</span>
+            <span class="font-bold text-emerald-400">₹499.00</span>
+          </div>
+          <div class="flex justify-between items-center text-slate-300">
+            <span class="text-slate-400">Submitted UTR:</span>
+            <span id="verifUtr" class="font-bold text-cyan-300 tracking-wider">412984920194</span>
+          </div>
+          <div class="pt-1 border-t border-slate-800 flex justify-between items-center">
+            <span class="text-slate-400 font-sans">Verification Status:</span>
+            <span id="verifStatusBadge" class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-sans font-bold animate-pulse">
+              ⏳ PENDING APPROVAL
+            </span>
+          </div>
+        </div>
+
+        <p class="text-[11px] text-slate-400 mb-4 leading-relaxed">
+          Admin jaise hi Sheet / Admin App me approve karega ya bank confirmation aayega, <span class="text-cyan-300 font-semibold">dashboard khud ba khud unlock ho jayega!</span>
+          <br><span class="text-[10px] text-slate-500">(Auto-checking Google Sheet every 3 seconds • Attempt <span id="pollAttemptCount">1</span>)</span>
+        </p>
+
+        <!-- Instant WhatsApp Approval Button -->
+        <a id="btnWhatsappProof" href="#" target="_blank"
+           class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition mb-3">
+          <i data-lucide="message-circle" class="w-4 h-4"></i>
+          <span>💬 WhatsApp Par Screenshot Bhejein (1-Min Fast Unlock)</span>
+        </a>
+
+        <button type="button" onclick="backToPaymentForm()" class="text-xs text-slate-400 hover:text-white transition">
+          ← Galat UTR daala hai? Dobara check karein
+        </button>
+      </div>
+
+      <!-- VIEW 3: SUCCESS CELEBRATION & THEME SELECTOR VIEW -->
+      <div id="paymentSuccessView" class="hidden text-left py-2 space-y-4">
+        <div class="text-center">
+          <div class="w-14 h-14 rounded-full bg-emerald-500/20 border-2 border-emerald-400 text-emerald-400 flex items-center justify-center mx-auto mb-2 shadow-lg shadow-emerald-500/20">
+            <i data-lucide="check" class="w-7 h-7 stroke-[3]"></i>
+          </div>
+          <h3 class="font-poppins font-black text-xl text-white">🎉 Payment Verified Successfully!</h3>
+          <p class="text-xs text-emerald-300 font-medium" id="successWelcomeMsg">Aapka account activate ho gaya hai!</p>
+          <div class="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-xs font-bold">
+            <i data-lucide="palette" class="w-3.5 h-3.5"></i>
+            <span>Step 1: Apni Dukaan Ki Default Theme Chunein</span>
+          </div>
+          <p class="text-[11px] text-slate-300 mt-1">Jo theme aap chunenge, wahi aapke frontend par default set ho jayegi, fir hum GitHub setup karenge:</p>
+        </div>
+
+        <!-- 6 Flagship Themes Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[46vh] overflow-y-auto pr-1" id="postPaymentThemeGrid">
+          
+          <!-- Card 1: Vastu Brahmand -->
+          <div class="theme-choice-card active p-3 rounded-2xl bg-gradient-to-br from-[#171A3A] to-slate-950 border-2 border-amber-400 cursor-pointer transition relative group shadow-md"
+               onclick="selectStoreTheme('vastu', this)">
+            <div class="flex items-start justify-between mb-1">
+              <span class="w-8 h-8 rounded-xl bg-amber-400/20 text-amber-300 flex items-center justify-center font-bold text-base">🕉️</span>
+              <span class="theme-check-badge w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold shadow">✓</span>
+            </div>
+            <h4 class="font-bold text-xs sm:text-sm text-amber-300 group-hover:text-amber-200">वास्तु ब्रह्मांड (Vastu Brahmand)</h4>
+            <p class="text-[10.5px] text-slate-300 mt-0.5 line-clamp-2">2D जियो-प्लॉटर, 16 ज़ोन, 45 देवता चक्र, वीडियो गाइड व डिजिटल गाइड्स शॉप।</p>
+            <div class="mt-2 flex items-center justify-between text-[10px] pt-1 border-t border-white/5">
+              <span class="text-amber-400 font-semibold font-mono">vastu-demo.html</span>
+              <a href="vastu-demo.html" target="_blank" onclick="event.stopPropagation()" class="text-cyan-400 hover:underline">Demo ↗</a>
+            </div>
+          </div>
+
+          <!-- Card 2: Saree & Ethnic Couture -->
+          <div class="theme-choice-card p-3 rounded-2xl bg-gradient-to-br from-[#200407] to-slate-950 border border-slate-700 hover:border-amber-400/70 cursor-pointer transition relative group shadow-md"
+               onclick="selectStoreTheme('saree', this)">
+            <div class="flex items-start justify-between mb-1">
+              <span class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-base">🥻</span>
+              <span class="theme-check-badge hidden w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold shadow">✓</span>
+            </div>
+            <h4 class="font-bold text-xs sm:text-sm text-[#F5DE7A] group-hover:text-amber-200">नूलम साड़ी (NOOLAM Saree)</h4>
+            <p class="text-[10.5px] text-slate-300 mt-0.5 line-clamp-2">Gopuram 6 Mood Arch, Interactive Saree Rail, Reels & 10% Bundle Checkout.</p>
+            <div class="mt-2 flex items-center justify-between text-[10px] pt-1 border-t border-white/5">
+              <span class="text-amber-400 font-semibold font-mono">saree-demo.html</span>
+              <a href="saree-demo.html" target="_blank" onclick="event.stopPropagation()" class="text-cyan-400 hover:underline">Demo ↗</a>
+            </div>
+          </div>
+
+          <!-- Card 3: Electronics & Smart Gadgets -->
+          <div class="theme-choice-card p-3 rounded-2xl bg-slate-950 border border-slate-700 hover:border-cyan-400/70 cursor-pointer transition relative group shadow-md"
+               onclick="selectStoreTheme('electronics', this)">
+            <div class="flex items-start justify-between mb-1">
+              <span class="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center font-bold text-base">📱</span>
+              <span class="theme-check-badge hidden w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold shadow">✓</span>
+            </div>
+            <h4 class="font-bold text-xs sm:text-sm text-cyan-400 group-hover:text-cyan-300">Electronics &amp; Gadgets</h4>
+            <p class="text-[10.5px] text-slate-300 mt-0.5 line-clamp-2">Smartphones, Audio, Laptops, Tech Accessories & Direct UPI.</p>
+            <div class="mt-2 flex items-center justify-between text-[10px] pt-1 border-t border-white/5">
+              <span class="text-cyan-400 font-semibold font-mono">demo.html?theme=electronics</span>
+              <a href="demo.html?theme=electronics" target="_blank" onclick="event.stopPropagation()" class="text-cyan-400 hover:underline">Demo ↗</a>
+            </div>
+          </div>
+
+          <!-- Card 4: Fashion & Apparel -->
+          <div class="theme-choice-card p-3 rounded-2xl bg-slate-950 border border-slate-700 hover:border-rose-400/70 cursor-pointer transition relative group shadow-md"
+               onclick="selectStoreTheme('fashion', this)">
+            <div class="flex items-start justify-between mb-1">
+              <span class="w-8 h-8 rounded-xl bg-rose-500/20 text-rose-300 flex items-center justify-center font-bold text-base">👗</span>
+              <span class="theme-check-badge hidden w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold shadow">✓</span>
+            </div>
+            <h4 class="font-bold text-xs sm:text-sm text-rose-400 group-hover:text-rose-300">Fashion &amp; Apparel</h4>
+            <p class="text-[10.5px] text-slate-300 mt-0.5 line-clamp-2">Clothing, Dresses, Streetwear & Luxury Style Catalog.</p>
+            <div class="mt-2 flex items-center justify-between text-[10px] pt-1 border-t border-white/5">
+              <span class="text-rose-400 font-semibold font-mono">demo.html?theme=fashion</span>
+              <a href="demo.html?theme=fashion" target="_blank" onclick="event.stopPropagation()" class="text-cyan-400 hover:underline">Demo ↗</a>
+            </div>
+          </div>
+
+          <!-- Card 5: Grocery & Food -->
+          <div class="theme-choice-card p-3 rounded-2xl bg-slate-950 border border-slate-700 hover:border-emerald-400/70 cursor-pointer transition relative group shadow-md"
+               onclick="selectStoreTheme('grocery_food', this)">
+            <div class="flex items-start justify-between mb-1">
+              <span class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-base">🛒</span>
+              <span class="theme-check-badge hidden w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold shadow">✓</span>
+            </div>
+            <h4 class="font-bold text-xs sm:text-sm text-emerald-400 group-hover:text-emerald-300">Grocery &amp; Daily Food</h4>
+            <p class="text-[10.5px] text-slate-300 mt-0.5 line-clamp-2">Fresh Organics, Fruits, Dairy, Snacks & Quick Cart.</p>
+            <div class="mt-2 flex items-center justify-between text-[10px] pt-1 border-t border-white/5">
+              <span class="text-emerald-400 font-semibold font-mono">demo.html?theme=grocery_food</span>
+              <a href="demo.html?theme=grocery_food" target="_blank" onclick="event.stopPropagation()" class="text-cyan-400 hover:underline">Demo ↗</a>
+            </div>
+          </div>
+
+          <!-- Card 6: Beauty & Personal Care -->
+          <div class="theme-choice-card p-3 rounded-2xl bg-slate-950 border border-slate-700 hover:border-pink-400/70 cursor-pointer transition relative group shadow-md"
+               onclick="selectStoreTheme('beauty_personal_care', this)">
+            <div class="flex items-start justify-between mb-1">
+              <span class="w-8 h-8 rounded-xl bg-pink-500/20 text-pink-300 flex items-center justify-center font-bold text-base">💄</span>
+              <span class="theme-check-badge hidden w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold shadow">✓</span>
+            </div>
+            <h4 class="font-bold text-xs sm:text-sm text-pink-400 group-hover:text-pink-300">Beauty &amp; Personal Care</h4>
+            <p class="text-[10.5px] text-slate-300 mt-0.5 line-clamp-2">Skincare, Makeup, Serums & Salon Grade Products.</p>
+            <div class="mt-2 flex items-center justify-between text-[10px] pt-1 border-t border-white/5">
+              <span class="text-pink-400 font-semibold font-mono">demo.html?theme=beauty_personal_care</span>
+              <a href="demo.html?theme=beauty_personal_care" target="_blank" onclick="event.stopPropagation()" class="text-cyan-400 hover:underline">Demo ↗</a>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Selected Theme Confirmation Box -->
+        <div class="p-3 bg-slate-950/90 rounded-xl border border-emerald-500/30 flex items-center justify-between">
+          <div>
+            <span class="text-[10px] text-slate-400 uppercase block font-semibold">Chuni Hui Default Theme:</span>
+            <span id="selectedThemeDisplay" class="text-xs font-bold text-emerald-400">🕉️ वास्तु ब्रह्मांड (Vastu Shastra & 16 Zones)</span>
+          </div>
+          <span class="text-[10px] text-slate-400">(Bad me bhi badal sakte hain)</span>
+        </div>
+
+        <!-- Confirm and Proceed Button -->
+        <button type="button" onclick="confirmThemeAndProceedToDashboard()"
+                class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 transition active:scale-95">
+          <span>Yeh Theme Set Karein &amp; GitHub Setup Shuru Karein ➔</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================
+       13. DEMO SELECTOR MODAL
+       ======================================================== -->
+  <div id="demoSelectorModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-4xl w-full p-6 sm:p-8 relative shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+      <div class="absolute -top-24 -left-24 w-60 h-60 bg-cyan-600/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -right-24 w-60 h-60 bg-amber-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <button onclick="closeDemoSelectorModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="text-center mb-6 relative z-10">
+        <span class="px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-bold inline-block mb-2">
+          ✨ Live Store Demos
+        </span>
+        <h3 class="font-poppins font-black text-2xl sm:text-3xl text-white">Kaunsa Store Demo Dekhna Chahte Hain?</h3>
+        <p class="text-xs text-dimWhite mt-1 max-w-md mx-auto">
+          SheetStore Pro se aap kisi bhi category ka 100% Google Sheet powered e-commerce store bana sakte hain:
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 relative z-10">
+        
+        <!-- Option 1: Digital Products Store -->
+        <div class="bg-slate-950/80 rounded-2xl p-5 border border-cyan-500/40 hover:border-cyan-400 flex flex-col justify-between transition group shadow-lg">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-lg">⚡</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-bold">5 Color Presets</span>
+            </div>
+            <h4 class="font-poppins font-bold text-base text-white group-hover:text-cyan-400 transition">Digital Products &amp; SaaS</h4>
+            <p class="text-xs text-dimWhite mt-1 leading-relaxed">
+              Software, Ebooks, Notion kits, AI Prompts &amp; Web Templates. Direct UPI QR + instant download link.
+            </p>
+          </div>
+          <div class="mt-4 pt-4 border-t border-slate-800">
+            <a href="demo.html" target="_blank" onclick="closeDemoSelectorModal()" class="w-full py-2.5 rounded-xl bg-blue-gradient text-primary font-poppins font-bold text-xs flex items-center justify-center gap-1.5 transition shadow">
+              <span>Open Digital Store ➔</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Option 2: NOOLAM Saree Showcase -->
+        <div class="bg-gradient-to-b from-[#200407] to-[#140204] rounded-2xl p-5 border border-[#D4AF37]/40 hover:border-[#D4AF37] flex flex-col justify-between transition group shadow-lg">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="w-10 h-10 rounded-xl bg-[#D4AF37]/20 text-[#D4AF37] flex items-center justify-center font-bold text-lg">🥻</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#D4AF37]/15 text-[#F5DE7A] border border-[#D4AF37]/30 font-bold font-cinzel">Luxury Studio</span>
+            </div>
+            <h4 class="font-poppins font-bold text-base text-[#F5DE7A] group-hover:text-white transition">NOOLAM Saree Studio</h4>
+            <p class="text-xs text-[#E5D5B8] mt-1 leading-relaxed">
+              Ethnic wear, 6 Moods archive, "Try the Look" bundle with 10% off, real clothes rail ("The Rack"), &amp; 3D silk arc.
+            </p>
+          </div>
+          <div class="mt-4 pt-4 border-t border-white/10">
+            <a href="saree-demo.html" target="_blank" onclick="closeDemoSelectorModal()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#F5DE7A] hover:from-[#E5C158] hover:to-[#FFF0A0] text-[#200407] font-poppins font-bold text-xs flex items-center justify-center gap-1.5 transition shadow">
+              <span>Open Saree Studio ➔</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Option 3: वास्तु ब्रह्मांड (Vastu Brahmand) -->
+        <div class="bg-gradient-to-b from-[#171A3A] to-[#0A0B1F] rounded-2xl p-5 border border-[#E9B44C]/50 hover:border-[#E9B44C] flex flex-col justify-between transition group shadow-lg">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="w-10 h-10 rounded-xl bg-[#E9B44C]/20 text-[#E9B44C] flex items-center justify-center font-bold text-lg">🕉️</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-[#E9B44C]/15 text-[#F6D58E] border border-[#E9B44C]/30 font-bold">Vedic Hub</span>
+            </div>
+            <h4 class="font-poppins font-bold text-base text-[#F6D58E] group-hover:text-white transition">वास्तु ब्रह्मांड (Vastu)</h4>
+            <p class="text-xs text-[#B2AFCB] mt-1 leading-relaxed">
+              2D जियो-प्लॉटर (GeoGebra इंजन), वीडियो ट्यूटोरियल, 16 ज़ोन व 45 देवता चक्र, 10-मिनट होम वास्तु स्कोर व डिजिटल गाइड्स शॉप।
+            </p>
+          </div>
+          <div class="mt-4 pt-4 border-t border-white/10">
+            <a href="vastu-demo.html" target="_blank" onclick="closeDemoSelectorModal()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#E9B44C] to-[#F08A3C] hover:from-[#F6D58E] hover:to-[#FFA050] text-[#0A0B1F] font-poppins font-bold text-xs flex items-center justify-center gap-1.5 transition shadow">
+              <span>Open Vastu Brahmand ➔</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="mt-5 text-center text-[11px] text-dimWhite relative z-10">
+        <span>Aap in sabhi templates ko Google Sheet aur Android Admin App se live manage kar sakte hain.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       14. CONFIG MODAL (Google Sheet Setup)
+       ======================================================== -->
+  <div id="configModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 relative">
+      <button onclick="closeConfigModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <h3 class="font-poppins font-bold text-lg text-white mb-2">Google Sheet Configuration</h3>
+      <p class="text-xs text-dimWhite mb-4">Apna Google Apps Script Web App URL yahan daalein:</p>
+      <input type="url" id="sheetUrlInput" 
+             value="https://script.google.com/macros/s/AKfycbzOoxV4jcP_lNwMDTVhguuKCS9o4PPTYoPJ1oL7gB_-XssArwgYqkk1BIn6ySCI8r3f/exec"
+             class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white mb-4 font-mono" />
+      <button onclick="closeConfigModal()" class="w-full py-2.5 rounded-xl bg-blue-gradient text-primary font-bold text-xs uppercase">
+        Save &amp; Close
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       15. IMAGE LIGHTBOX MODAL (Click to Zoom Screenshots)
+       ======================================================== -->
+  <div id="imageLightboxModal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4 sm:p-8" onclick="closeImageModal()">
+    <div class="relative max-w-5xl w-full flex flex-col items-center" onclick="event.stopPropagation()">
+      <button onclick="closeImageModal()" class="absolute -top-12 right-0 sm:top-2 sm:right-2 z-10 w-10 h-10 rounded-full bg-slate-800/90 hover:bg-slate-700 text-white flex items-center justify-center transition border border-slate-600 shadow-xl cursor-pointer">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      <div class="w-full rounded-2xl overflow-hidden border border-slate-700 bg-slate-950 shadow-2xl flex items-center justify-center max-h-[82vh] p-2">
+        <img id="lightboxImg" src="" alt="Screenshot Full View" class="w-full h-auto max-h-[78vh] object-contain rounded-xl" />
+      </div>
+      <p id="lightboxCaption" class="text-center text-xs sm:text-sm font-semibold text-white mt-3 px-5 py-2 rounded-full bg-slate-900/95 border border-cyan-500/30 font-poppins shadow-lg"></p>
+    </div>
+  </div>
+
+  <!-- GitHub Repo Copy & Next Steps Guidance Modal for Homepage -->
+  <div id="indexRepoPopupModal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4 sm:p-6 overflow-y-auto" onclick="closeIndexRepoPopupModal()">
+    <div class="relative max-w-2xl w-full bg-slate-900 border border-slate-700 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 text-left my-6" onclick="event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="flex items-start justify-between border-b border-slate-800 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0 shadow">
+            <i data-lucide="git-fork" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 text-[10px] font-bold uppercase tracking-wider border border-cyan-500/20">
+                1-Click Setup
+              </span>
+              <span class="text-[10px] text-dimWhite">Frontend Hosting</span>
+            </div>
+            <h3 class="font-poppins font-bold text-lg sm:text-xl text-white mt-0.5">
+              GitHub Repo Copy &amp; Live Setup Steps
+            </h3>
+          </div>
+        </div>
+        <button onclick="closeIndexRepoPopupModal()" class="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center transition border border-slate-700">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Popup notice -->
+      <div class="p-3.5 rounded-2xl bg-cyan-950/40 border border-cyan-500/30 flex items-start gap-3">
+        <i data-lucide="external-link" class="w-4 h-4 text-cyan-400 shrink-0 mt-0.5"></i>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          GitHub popup window khul chuka hai! Agar browser ne popup block kiya ho, toh 
+          <a href="https://github.com/new?template_name=freewebsite&template_owner=yuviteltechnologies-art&name=mystore&visibility=public" target="_blank" class="text-cyan-400 underline font-bold">Yahan Click Karke Kholein ↗</a>
+        </p>
+      </div>
+
+      <!-- 3 Steps -->
+      <div class="space-y-3.5 text-xs text-slate-300">
+        <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
+          <span class="w-5 h-5 rounded-full bg-cyan-500/20 text-cyan-400 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+          <div>
+            <strong class="text-white block mb-0.5">Popup me 'Create repository' dabayein</strong>
+            <span>Public pehle se selected rahega. Green button dabate hi repository aapke account me copy ho jayegi.</span>
+          </div>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 flex items-start gap-3">
+          <span class="w-5 h-5 rounded-full bg-blue-500/20 text-blue-400 text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+          <div>
+            <strong class="text-white block mb-0.5">GitHub Pages ON karein (Branch: main ➔ Save)</strong>
+            <span>Apne repo ke <strong>Settings ➔ Pages</strong> me jayein, Branch me <code class="text-cyan-400 font-mono font-bold">main</code> chunein aur Save karein.</span>
+          </div>
+        </div>
+
+        <!-- 404 Error Clarification -->
+        <div class="p-3.5 rounded-xl bg-amber-950/30 border border-amber-500/40 space-y-1.5">
+          <div class="flex items-center gap-2 text-amber-400 font-bold">
+            <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0"></i>
+            <span>⚠️ 404 Error Kyun Aata Hai? (Ghabrayein Nahi)</span>
+          </div>
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            1. Jab tak aap <strong>Settings ➔ Pages</strong> me <strong>main</strong> branch save nahi karte, site 404 dikhati hai.<br>
+            2. Save dabane ke baad GitHub server ko pehli baar website build karne me <strong>45-60 seconds</strong> lagte hain. Isliye turant 404 dekhkar pareshan na hon, 1 minute me site live ho jati hai!
+          </p>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <a href="dashboard.html" class="text-xs text-cyan-400 hover:underline flex items-center gap-1">
+          <span>Complete Automated Dashboard Kholein</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        </a>
+        <button onclick="closeIndexRepoPopupModal()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs transition">
+          Samajh Gaya ✓
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+
+      // Check user session
+      try {
+        const authUser = localStorage.getItem('sheetstore_auth_user');
+        if (authUser) {
+          const u = JSON.parse(authUser);
+          const navAuthText = document.getElementById('navAuthText');
+          const navAuthBtn = document.getElementById('navAuthBtn');
+          if (navAuthText && u && u.name) {
+            navAuthText.innerText = "Dashboard";
+            if (navAuthBtn) navAuthBtn.href = "dashboard.html";
+          }
+        }
+      } catch (e) {}
+    });
+
+    function openDemoSelectorModal() {
+      const modal = document.getElementById('demoSelectorModal');
+      if (modal) modal.classList.remove('hidden');
+    }
+    function closeDemoSelectorModal() {
+      const modal = document.getElementById('demoSelectorModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function openPaymentModal() {
+      document.getElementById('paymentModal').classList.remove('hidden');
+    }
+    function closePaymentModal() {
+      document.getElementById('paymentModal').classList.add('hidden');
+    }
+
+    function openConfigModal() {
+      document.getElementById('configModal').classList.remove('hidden');
+    }
+    function closeConfigModal() {
+      document.getElementById('configModal').classList.add('hidden');
+    }
+
+    function openGitHubRepoPopup() {
+      const popupUrl = 'https://github.com/new?template_name=freewebsite&template_owner=yuviteltechnologies-art&name=mystore&visibility=public';
+      const width = Math.min(1040, window.screen.width - 40);
+      const height = Math.min(760, window.screen.height - 80);
+      const left = Math.max(20, Math.floor((window.screen.width - width) / 2));
+      const top = Math.max(20, Math.floor((window.screen.height - height) / 2));
+      window.open(popupUrl, 'GitHubRepoCreator', `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`);
+      
+      const modal = document.getElementById('indexRepoPopupModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => { lucide.createIcons(); }, 50);
+      }
+    }
+
+    function closeIndexRepoPopupModal() {
+      const modal = document.getElementById('indexRepoPopupModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+      }
+    }
+
+    // Lightbox Screenshot Zoom
+    function openImageModal(src, caption) {
+      const modal = document.getElementById('imageLightboxModal');
+      const img = document.getElementById('lightboxImg');
+      const cap = document.getElementById('lightboxCaption');
+      if (modal && img) {
+        img.src = src;
+        if (cap) cap.innerText = caption || 'Setup Guide Screenshot';
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => { lucide.createIcons(); }, 50);
+      }
+    }
+
+    function closeImageModal() {
+      const modal = document.getElementById('imageLightboxModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+      }
+    }
+
+    // Global Escape Key to close all modals
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeImageModal();
+        closeDemoSelectorModal();
+        closePaymentModal();
+        closeConfigModal();
+      }
+    });
+
+    function toggleFaq(card) {
+      const p = card.querySelector('p');
+      const icon = card.querySelector('[data-lucide="chevron-down"]');
+      if (p.classList.contains('hidden')) {
+        p.classList.remove('hidden');
+        if (icon) icon.style.transform = 'rotate(180deg)';
+      } else {
+        p.classList.add('hidden');
+        if (icon) icon.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    let activePollTimer = null;
+
+    function switchPaymentMethod(method) {
+      const appsBtn = document.getElementById('tabUpiAppsBtn');
+      const qrBtn = document.getElementById('tabQrCodeBtn');
+      const appsSec = document.getElementById('upiAppsSection');
+      const qrSec = document.getElementById('qrCodeSection');
+
+      if (!appsBtn || !qrBtn || !appsSec || !qrSec) return;
+
+      if (method === 'qr') {
+        appsSec.classList.add('hidden');
+        qrSec.classList.remove('hidden');
+        qrBtn.className = "py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 bg-blue-600 text-white shadow-md";
+        appsBtn.className = "py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-400 hover:text-white";
+      } else {
+        qrSec.classList.add('hidden');
+        appsSec.classList.remove('hidden');
+        appsBtn.className = "py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 bg-blue-600 text-white shadow-md";
+        qrBtn.className = "py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-400 hover:text-white";
+      }
+      lucide.createIcons();
+    }
+
+    const MASTER_API_URL = "https://script.google.com/macros/s/AKfycbzOoxV4jcP_lNwMDTVhguuKCS9o4PPTYoPJ1oL7gB_-XssArwgYqkk1BIn6ySCI8r3f/exec";
+
+    let activeStoreSettings = {
+      brandName: localStorage.getItem('store_brand_name') || "new record",
+      upiId: localStorage.getItem('store_upi_id') || "9907522413@ybl",
+      whatsappNumber: localStorage.getItem('store_wa_num') || "9907522413",
+      sheetUrl: localStorage.getItem('store_sheet_url') || MASTER_API_URL,
+      logoUrl: localStorage.getItem('store_logo_url') || "",
+      qrCodeUrl: localStorage.getItem('store_qr_code_url') || "",
+      altPhone: localStorage.getItem('store_alt_phone') || "",
+      helplineNumber: localStorage.getItem('store_helpline') || "",
+      businessEmail: localStorage.getItem('store_email') || "",
+      businessAddress: localStorage.getItem('store_address') || "",
+      mapUrl: localStorage.getItem('store_map_url') || "",
+      showContactForm: localStorage.getItem('store_show_contact_form') || "true"
+    };
+
+    function applyStoreSettingsToDom() {
+      const upi = activeStoreSettings.upiId || '9907522413@ybl';
+      const brand = activeStoreSettings.brandName || 'SheetStore';
+      const wa = activeStoreSettings.whatsappNumber || '9907522413';
+
+      // 1. Update QR Code Image dynamically
+      const qrImg = document.getElementById('paymentQrCodeImg');
+      if (qrImg) {
+        if (activeStoreSettings.qrCodeUrl) {
+          qrImg.src = activeStoreSettings.qrCodeUrl;
+        } else {
+          const qrData = `upi://pay?pa=${encodeURIComponent(upi)}&pn=${encodeURIComponent(brand)}&am=499&cu=INR&tn=SheetStoreOrder`;
+          qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}`;
+        }
+      }
+
+      // 2. Update UPI texts & copy buttons
+      const copyTxt = document.getElementById('copyUpiBtnText');
+      if (copyTxt) copyTxt.innerText = `Copy UPI: ${upi}`;
+      const safeTxt = document.getElementById('safeUpiIdText');
+      if (safeTxt) safeTxt.innerText = upi;
+      const qrTxt = document.getElementById('qrUpiTextDisplay');
+      if (qrTxt) qrTxt.innerText = `UPI: ${upi}`;
+
+      // 3. Update WhatsApp links
+      document.querySelectorAll('.live-wa-link').forEach(link => {
+        link.href = `https://wa.me/${wa}?text=${encodeURIComponent("Namaste! Mujhe website ke bare me jaankari chahiye.")}`;
+      });
+
+      // 4. Update Logo if custom logo is uploaded
+      if (activeStoreSettings.logoUrl) {
+        document.querySelectorAll('.store-logo-img').forEach(img => {
+          img.src = activeStoreSettings.logoUrl;
+        });
+      }
+
+      // 5. Update Helpline & Alternate Phone
+      if (activeStoreSettings.helplineNumber) {
+        document.querySelectorAll('.store-helpline-link').forEach(link => {
+          link.href = `tel:${activeStoreSettings.helplineNumber}`;
+          link.innerText = activeStoreSettings.helplineNumber;
+        });
+      }
+
+      // 6. Update Official Email
+      if (activeStoreSettings.businessEmail) {
+        document.querySelectorAll('.store-email-link').forEach(link => {
+          link.href = `mailto:${activeStoreSettings.businessEmail}`;
+          link.innerText = activeStoreSettings.businessEmail;
+        });
+      }
+
+      // 7. Update Physical Address
+      if (activeStoreSettings.businessAddress) {
+        document.querySelectorAll('.store-address-text').forEach(el => {
+          el.innerText = activeStoreSettings.businessAddress;
+        });
+      }
+
+      // 8. Update Google Map
+      if (activeStoreSettings.mapUrl) {
+        document.querySelectorAll('.store-map-link').forEach(link => {
+          link.href = activeStoreSettings.mapUrl;
+        });
+      }
+    }
+
+    async function syncSettingsFromGoogleSheet() {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const sheetUrl = urlParams.get('sheet') || activeStoreSettings.sheetUrl;
+        const res = await fetch(sheetUrl);
+        const data = await res.json();
+        if (data && data.settings) {
+          const s = data.settings;
+          if (s.upi_id) {
+            activeStoreSettings.upiId = String(s.upi_id).trim();
+            localStorage.setItem('store_upi_id', activeStoreSettings.upiId);
+          }
+          if (s.whatsapp_number) {
+            activeStoreSettings.whatsappNumber = String(s.whatsapp_number).trim();
+            localStorage.setItem('store_wa_num', activeStoreSettings.whatsappNumber);
+          }
+          if (s.brand_name) {
+            activeStoreSettings.brandName = String(s.brand_name).trim();
+            localStorage.setItem('store_brand_name', activeStoreSettings.brandName);
+          }
+          if (s.logo_url) {
+            activeStoreSettings.logoUrl = String(s.logo_url).trim();
+            localStorage.setItem('store_logo_url', activeStoreSettings.logoUrl);
+          }
+          if (s.qr_code_url) {
+            activeStoreSettings.qrCodeUrl = String(s.qr_code_url).trim();
+            localStorage.setItem('store_qr_code_url', activeStoreSettings.qrCodeUrl);
+          }
+          if (s.alt_phone) {
+            activeStoreSettings.altPhone = String(s.alt_phone).trim();
+            localStorage.setItem('store_alt_phone', activeStoreSettings.altPhone);
+          }
+          if (s.helpline_number) {
+            activeStoreSettings.helplineNumber = String(s.helpline_number).trim();
+            localStorage.setItem('store_helpline', activeStoreSettings.helplineNumber);
+          }
+          if (s.business_email) {
+            activeStoreSettings.businessEmail = String(s.business_email).trim();
+            localStorage.setItem('store_email', activeStoreSettings.businessEmail);
+          }
+          if (s.business_address) {
+            activeStoreSettings.businessAddress = String(s.business_address).trim();
+            localStorage.setItem('store_address', activeStoreSettings.businessAddress);
+          }
+          if (s.map_url) {
+            activeStoreSettings.mapUrl = String(s.map_url).trim();
+            localStorage.setItem('store_map_url', activeStoreSettings.mapUrl);
+          }
+          if (s.show_contact_form) {
+            activeStoreSettings.showContactForm = String(s.show_contact_form).trim();
+            localStorage.setItem('store_show_contact_form', activeStoreSettings.showContactForm);
+          }
+          applyStoreSettingsToDom();
+        }
+      } catch (e) {
+        console.warn('Silent sheet settings fetch:', e);
+      }
+    }
+
+    // Initialize dynamic settings on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      applyStoreSettingsToDom();
+      syncSettingsFromGoogleSheet();
+    });
+
+    function launchUpi(app) {
+      const upiId = activeStoreSettings.upiId || '9907522413@ybl';
+      const payeeName = activeStoreSettings.brandName || 'SheetStore';
+      const amount = '499';
+      const note = 'SheetStoreKit';
+
+      // Standard NPCI generic URI (safest protocol recognized by all apps)
+      const genericUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}`;
+
+      let targetUri = genericUri;
+
+      if (app === 'phonepe') {
+        targetUri = `phonepe://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}`;
+      } else if (app === 'gpay') {
+        targetUri = `gpay://upi/pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}`;
+      } else if (app === 'paytm') {
+        targetUri = `paytmmp://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}`;
+      } else {
+        targetUri = genericUri;
+      }
+
+      // Unhide post-payment prompt banner for when user returns
+      const banner = document.getElementById('postPaymentBanner');
+      if (banner) banner.classList.remove('hidden');
+      lucide.createIcons();
+
+      // Fallback timer: if phone lacks custom scheme or browser warns, fallback to universal UPI URI
+      const start = Date.now();
+      setTimeout(() => {
+        if (targetUri !== genericUri && (Date.now() - start < 1800)) {
+          window.location.href = genericUri;
+        }
+      }, 1000);
+
+      window.location.href = targetUri;
+    }
+
+    // Auto-detect when user switches back from UPI app to Chrome
+    window.addEventListener('focus', () => {
+      const modal = document.getElementById('paymentModal');
+      const utrInput = document.getElementById('buyerUtr');
+      const banner = document.getElementById('postPaymentBanner');
+      if (modal && !modal.classList.contains('hidden') && utrInput) {
+        if (banner) banner.classList.remove('hidden');
+        utrInput.classList.add('border-cyan-400', 'ring-2', 'ring-cyan-400/40');
+      }
+    });
+
+    function copyUpiId() {
+      const upiId = activeStoreSettings.upiId || '9907522413@ybl';
+      navigator.clipboard.writeText(upiId).then(() => {
+        alert(`✅ UPI ID Copied: ${upiId}\n\nAb PhonePe ya Google Pay kholein, "Pay to UPI ID" option chunein aur ${upiId} paste karke ₹499 transfer karein. Isse bina kisi warning ke turant payment ho jayegi!`);
+      }).catch(() => {
+        prompt('UPI ID copy karein:', upiId);
+      });
+    }
+
+    function showPaymentError(msg) {
+      const box = document.getElementById('paymentErrorMsg');
+      const text = document.getElementById('paymentErrorText');
+      if (box && text) {
+        text.innerText = msg;
+        box.classList.remove('hidden');
+      }
+    }
+
+    function hidePaymentError() {
+      const box = document.getElementById('paymentErrorMsg');
+      if (box) box.classList.add('hidden');
+    }
+
+    function backToPaymentForm() {
+      if (activePollTimer) {
+        clearInterval(activePollTimer);
+        activePollTimer = null;
+      }
+      document.getElementById('paymentVerificationView').classList.add('hidden');
+      document.getElementById('paymentSuccessView').classList.add('hidden');
+      document.getElementById('paymentFormView').classList.remove('hidden');
+      const btn = document.getElementById('btnSubmitPayment');
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="shield-check" class="w-4 h-4 stroke-[2.5]"></i> <span>Payment Confirm Karein &amp; UTR Verify Karein 🔒</span>`;
+      }
+      lucide.createIcons();
+    }
+
+    // Override closePaymentModal to stop polling safely
+    const originalClosePaymentModal = closePaymentModal;
+    closePaymentModal = function() {
+      if (activePollTimer) {
+        clearInterval(activePollTimer);
+        activePollTimer = null;
+      }
+      document.getElementById('paymentModal').classList.add('hidden');
+      backToPaymentForm();
+    };
+
+    function submitOrderForVerification() {
+      hidePaymentError();
+      const name = document.getElementById('buyerName').value.trim();
+      const rawPhone = document.getElementById('buyerPhone').value.trim();
+      const email = document.getElementById('buyerEmail').value.trim();
+      const utr = document.getElementById('buyerUtr').value.trim();
+
+      if (!name) {
+        showPaymentError('Kripya apna poora Naam daalein.');
+        return;
+      }
+
+      const cleanPhone = rawPhone.replace(/\D/g, '');
+      if (cleanPhone.length < 10) {
+        showPaymentError('Kripya 10-digit ka valid WhatsApp Mobile Number daalein.');
+        return;
+      }
+
+      if (!email || email.indexOf('@') === -1 || email.indexOf('.') === -1) {
+        showPaymentError('Kripya valid Email Address daalein.');
+        return;
+      }
+
+      // STRICT 12-DIGIT UTR VALIDATION (Prevents direct bypass without payment)
+      const cleanUtr = utr.replace(/\s+/g, '');
+      if (!/^\d{12}$/.test(cleanUtr)) {
+        showPaymentError('❌ Kripya UPI payment ke baad mila 12-digit numeric UTR / Reference No. darj karein. Bina payment & valid UTR ke dashboard unlock nahi hoga!');
+        document.getElementById('buyerUtr').focus();
+        return;
+      }
+
+      const btn = document.getElementById('btnSubmitPayment');
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Submitting Order...`;
+      lucide.createIcons();
+
+      const orderId = 'ORD-' + Math.floor(100000 + Math.random() * 900000);
+      const masterApi = "https://script.google.com/macros/s/AKfycbzOoxV4jcP_lNwMDTVhguuKCS9o4PPTYoPJ1oL7gB_-XssArwgYqkk1BIn6ySCI8r3f/exec";
+
+      // Populate Verification Screen
+      document.getElementById('verifOrderId').innerText = '#' + orderId;
+      document.getElementById('verifCustomerName').innerText = name;
+      document.getElementById('verifUtr').innerText = cleanUtr;
+      
+      const waMsg = `Namaste! Maine SheetStore Pro ke liye ₹499 pay kiya hai.%0A%0A*Order ID:* ${orderId}%0A*UTR No:* ${cleanUtr}%0A*Customer Name:* ${encodeURIComponent(name)}%0A*WhatsApp:* ${cleanPhone}%0A*Email:* ${encodeURIComponent(email)}%0A%0AKripya mera dashboard unlock karein.`;
+      const waBtn = document.getElementById('btnWhatsappProof');
+      if (waBtn) {
+        waBtn.href = `https://wa.me/917987823521?text=${waMsg}`;
+      }
+
+      // Switch to Verification View
+      document.getElementById('paymentFormView').classList.add('hidden');
+      document.getElementById('paymentVerificationView').classList.remove('hidden');
+      lucide.createIcons();
+
+      // Step 1: Create Order in Google Sheet with PENDING status
+      const params = new URLSearchParams({
+        action: 'createOrder',
+        order_id: orderId,
+        customer_name: name,
+        customer_phone: cleanPhone,
+        customer_email: email,
+        amount: '499',
+        utr: cleanUtr
+      });
+
+      // Send order registration to Google Sheet
+      fetch(`${masterApi}?${params.toString()}`)
+        .catch(e => console.log('Order push logged:', e));
+
+      // Step 2: Start Polling for Approval
+      let attempts = 0;
+      const pollAttemptDisplay = document.getElementById('pollAttemptCount');
+
+      if (activePollTimer) clearInterval(activePollTimer);
+
+      const cleanOrderId = String(orderId).replace(/^#/, '').trim();
+
+      activePollTimer = setInterval(async () => {
+        attempts++;
+        if (pollAttemptDisplay) pollAttemptDisplay.innerText = attempts;
+
+        try {
+          // Poll specifically by unique Order ID so we never cross-match older test UTRs
+          const checkUrl = `${masterApi}?action=checkOrderStatus&order_id=${encodeURIComponent(cleanOrderId)}`;
+          const res = await fetch(checkUrl);
+          const data = await res.json();
+
+          if (data && (data.status === "PAID" || data.is_paid === true)) {
+            // STOP POLLING - PAYMENT VERIFIED!
+            clearInterval(activePollTimer);
+            activePollTimer = null;
+
+            // Show celebratory success
+            document.getElementById('paymentVerificationView').classList.add('hidden');
+            document.getElementById('paymentSuccessView').classList.remove('hidden');
+            document.getElementById('successWelcomeMsg').innerText = `Welcome, ${name}! Aapka ₹499 payment verify ho gaya hai.`;
+            lucide.createIcons();
+
+            if (typeof confetti === 'function') {
+              confetti({ particleCount: 120, spread: 90, origin: { y: 0.6 } });
+            }
+
+            // Save verified paid user session
+            const authUser = {
+              id: cleanOrderId,
+              name: name,
+              phone: cleanPhone,
+              email: email,
+              is_paid: true,
+              status: "ACTIVE",
+              onboarding_step: 1,
+              selected_theme: currentChosenTheme || 'vastu'
+            };
+            localStorage.setItem('sheetstore_auth_user', JSON.stringify(authUser));
+            sessionStorage.setItem('sheetstore_logged_in', 'true');
+            sessionStorage.setItem('sheetstore_current_order', cleanOrderId);
+
+            // Store in memory for theme confirmation step
+            currentVerifiedOrder = {
+              orderId: cleanOrderId,
+              name: name,
+              phone: cleanPhone,
+              email: email
+            };
+
+            // Set default theme selection
+            selectStoreTheme(currentChosenTheme || 'vastu');
+          }
+        } catch (err) {
+          console.warn('Polling check error:', err);
+        }
+      }, 3000);
+    }
+
+    // THEME SELECTION & PROCEED TO DASHBOARD HANDLERS
+    let currentChosenTheme = 'vastu';
+    let currentVerifiedOrder = null;
+
+    const themeDisplayNames = {
+      'vastu': '🕉️ वास्तु ब्रह्मांड (Vastu Shastra & 16 Zones)',
+      'saree': '🥻 नूलम साड़ी (NOOLAM Saree & Ethnic Couture)',
+      'electronics': '⚡ Electronics & Gadgets Pro',
+      'fashion': '👗 Fashion & Apparel Boutique',
+      'grocery_food': '🛒 Grocery & Daily Food Mart',
+      'beauty_personal_care': '💄 Beauty & Personal Care'
+    };
+
+    function selectStoreTheme(themeKey, el) {
+      currentChosenTheme = themeKey;
+
+      // Update card UI highlights
+      const grid = document.getElementById('postPaymentThemeGrid');
+      if (grid) {
+        const cards = grid.querySelectorAll('.theme-choice-card');
+        cards.forEach(card => {
+          card.classList.remove('active', 'border-2', 'border-amber-400', 'border-emerald-400', 'border-cyan-400', 'border-rose-400', 'border-pink-400');
+          card.classList.add('border-slate-700');
+          const badge = card.querySelector('.theme-check-badge');
+          if (badge) badge.classList.add('hidden');
+        });
+
+        // Find clicked card or card matching themeKey
+        let targetCard = el;
+        if (!targetCard) {
+          cards.forEach(card => {
+            const oc = card.getAttribute('onclick') || '';
+            if (oc.includes(`'${themeKey}'`)) targetCard = card;
+          });
+        }
+
+        if (targetCard) {
+          targetCard.classList.remove('border-slate-700');
+          targetCard.classList.add('active', 'border-2', 'border-emerald-400');
+          const badge = targetCard.querySelector('.theme-check-badge');
+          if (badge) badge.classList.remove('hidden');
+        }
+      }
+
+      const display = document.getElementById('selectedThemeDisplay');
+      if (display) {
+        display.innerText = themeDisplayNames[themeKey] || themeKey;
+      }
+    }
+
+    function confirmThemeAndProceedToDashboard() {
+      const theme = currentChosenTheme || 'vastu';
+      localStorage.setItem('sheetstore_selected_theme', theme);
+      localStorage.setItem('store_active_template', theme);
+
+      let orderId = '';
+      let email = '';
+      let name = '';
+
+      if (currentVerifiedOrder) {
+        orderId = currentVerifiedOrder.orderId || '';
+        email = currentVerifiedOrder.email || '';
+        name = currentVerifiedOrder.name || '';
+      } else {
+        const stored = localStorage.getItem('sheetstore_auth_user');
+        if (stored) {
+          try {
+            const u = JSON.parse(stored);
+            orderId = u.id || '';
+            email = u.email || '';
+            name = u.name || '';
+            u.selected_theme = theme;
+            localStorage.setItem('sheetstore_auth_user', JSON.stringify(u));
+          } catch(e){}
+        }
+      }
+
+      // Best effort background sync of theme to Google Sheet
+      try {
+        const masterApi = "https://script.google.com/macros/s/AKfycbzOoxV4jcP_lNwMDTVhguuKCS9o4PPTYoPJ1oL7gB_-XssArwgYqkk1BIn6ySCI8r3f/exec";
+        const syncParams = new URLSearchParams({
+          action: 'updateOrderTheme',
+          order_id: orderId,
+          email: email,
+          theme: theme
+        });
+        fetch(`${masterApi}?${syncParams.toString()}`).catch(() => {});
+      } catch(e){}
+
+      // Navigate to Dashboard with chosen theme & order info
+      const targetUrl = `dashboard.html?theme=${encodeURIComponent(theme)}&order_id=${encodeURIComponent(orderId)}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`;
+      window.location.href = targetUrl;
+    }
+  </script>
+
+</body>
+</html>
